@@ -1,0 +1,1 @@
+{"title":"Invalid references","invalid_claim":{"claim_id":"bad","statement":"Invalid","status":"inferred","supporting_evidence_ids":["missing"],"confidence":0.5},"evidence_items":[{"evidence_id":"present","modality":"metadata","evidence_type":"title","text":"Present","confidence":1.0,"provider":"fake","processing_version":"1"}]}

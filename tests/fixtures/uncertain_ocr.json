@@ -1,0 +1,1 @@
+{"title":"Uncertain OCR","evidence_items":[{"evidence_id":"ocr-1","modality":"screen_text","evidence_type":"measurement","start_ms":0,"end_ms":1000,"text":"5.O2 V","confidence":0.51,"uncertainty":"The second character may be zero rather than letter O.","provider":"fake","processing_version":"1"}]}

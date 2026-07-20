@@ -1,0 +1,1 @@
+{"title":"Visual demonstration","evidence_items":[{"evidence_id":"visual-1","modality":"visual_event","evidence_type":"physical_action","start_ms":500,"end_ms":3000,"description":"The indicator changes from red to green after the button is pressed.","confidence":0.91,"provider":"fake","processing_version":"1"}]}

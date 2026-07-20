@@ -1,0 +1,24 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+from video_intelligence.models import AcquisitionDiagnostic, AnalysisResult, EvidenceItem
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def main() -> None:
+    schemas = {
+        "analysis-result.schema.json": AnalysisResult.model_json_schema(),
+        "evidence-item.schema.json": EvidenceItem.model_json_schema(),
+        "acquisition-diagnostic.schema.json": AcquisitionDiagnostic.model_json_schema(),
+    }
+    target = ROOT / "schemas"
+    target.mkdir(exist_ok=True)
+    for name, schema in schemas.items():
+        (target / name).write_text(json.dumps(schema, indent=2) + "\n", encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

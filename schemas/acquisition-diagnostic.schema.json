@@ -1,0 +1,132 @@
+{
+  "$defs": {
+    "AcquisitionAttempt": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/AttemptOutcome"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "outcome",
+        "detail"
+      ],
+      "title": "AcquisitionAttempt",
+      "type": "object"
+    },
+    "AttemptOutcome": {
+      "enum": [
+        "succeeded",
+        "failed",
+        "not_applicable"
+      ],
+      "title": "AttemptOutcome",
+      "type": "string"
+    },
+    "Platform": {
+      "enum": [
+        "youtube",
+        "instagram",
+        "tiktok",
+        "local",
+        "synthetic",
+        "unknown"
+      ],
+      "title": "Platform",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "platform": {
+      "$ref": "#/$defs/Platform"
+    },
+    "attempts": {
+      "items": {
+        "$ref": "#/$defs/AcquisitionAttempt"
+      },
+      "title": "Attempts",
+      "type": "array"
+    },
+    "terminal_failure_reason": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Terminal Failure Reason"
+    },
+    "browser_played": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Browser Played"
+    },
+    "audio_detected": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Audio Detected"
+    },
+    "valid_video_frames_detected": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Valid Video Frames Detected"
+    },
+    "safest_recovery_action": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Safest Recovery Action"
+    }
+  },
+  "required": [
+    "platform",
+    "attempts"
+  ],
+  "title": "AcquisitionDiagnostic",
+  "type": "object"
+}

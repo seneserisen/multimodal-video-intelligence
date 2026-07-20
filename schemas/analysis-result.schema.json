@@ -1,0 +1,912 @@
+{
+  "$defs": {
+    "AcquisitionAttempt": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "title": "Method",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/AttemptOutcome"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        }
+      },
+      "required": [
+        "method",
+        "outcome",
+        "detail"
+      ],
+      "title": "AcquisitionAttempt",
+      "type": "object"
+    },
+    "AcquisitionDiagnostic": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "platform": {
+          "$ref": "#/$defs/Platform"
+        },
+        "attempts": {
+          "items": {
+            "$ref": "#/$defs/AcquisitionAttempt"
+          },
+          "title": "Attempts",
+          "type": "array"
+        },
+        "terminal_failure_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Terminal Failure Reason"
+        },
+        "browser_played": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Browser Played"
+        },
+        "audio_detected": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Audio Detected"
+        },
+        "valid_video_frames_detected": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Valid Video Frames Detected"
+        },
+        "safest_recovery_action": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Safest Recovery Action"
+        }
+      },
+      "required": [
+        "platform",
+        "attempts"
+      ],
+      "title": "AcquisitionDiagnostic",
+      "type": "object"
+    },
+    "AttemptOutcome": {
+      "enum": [
+        "succeeded",
+        "failed",
+        "not_applicable"
+      ],
+      "title": "AttemptOutcome",
+      "type": "string"
+    },
+    "BoundingBox": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "X",
+          "type": "number"
+        },
+        "y": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Y",
+          "type": "number"
+        },
+        "width": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Width",
+          "type": "number"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Height",
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "title": "BoundingBox",
+      "type": "object"
+    },
+    "Claim": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "claim_id": {
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "statement": {
+          "title": "Statement",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/ClaimStatus"
+        },
+        "supporting_evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Supporting Evidence Ids",
+          "type": "array"
+        },
+        "contradicting_evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Contradicting Evidence Ids",
+          "type": "array"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "verification_note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Verification Note"
+        }
+      },
+      "required": [
+        "claim_id",
+        "statement",
+        "status",
+        "confidence"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "ClaimStatus": {
+      "enum": [
+        "explicitly_spoken",
+        "shown_on_screen",
+        "visually_observed",
+        "demonstrated",
+        "cross_modal_confirmed",
+        "speaker_opinion",
+        "unsupported_claim",
+        "contradicted",
+        "inferred",
+        "uncertain"
+      ],
+      "title": "ClaimStatus",
+      "type": "string"
+    },
+    "CoverageReport": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "evidence_count_by_modality": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Evidence Count By Modality",
+          "type": "object"
+        },
+        "timed_evidence_ratio": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Timed Evidence Ratio",
+          "type": "number"
+        },
+        "uncertain_evidence_count": {
+          "minimum": 0,
+          "title": "Uncertain Evidence Count",
+          "type": "integer"
+        },
+        "acquisition_complete": {
+          "title": "Acquisition Complete",
+          "type": "boolean"
+        },
+        "analysis_complete": {
+          "title": "Analysis Complete",
+          "type": "boolean"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "evidence_count_by_modality",
+        "timed_evidence_ratio",
+        "uncertain_evidence_count",
+        "acquisition_complete",
+        "analysis_complete"
+      ],
+      "title": "CoverageReport",
+      "type": "object"
+    },
+    "ErrorCode": {
+      "enum": [
+        "invalid_url",
+        "unsupported_platform",
+        "unavailable_media",
+        "direct_provider_failure",
+        "extractor_failure",
+        "tab_capture_failure",
+        "missing_audio",
+        "missing_video",
+        "silent_capture",
+        "black_capture",
+        "frozen_video",
+        "incomplete_recording",
+        "unsupported_codec",
+        "ffmpeg_unavailable",
+        "provider_unavailable",
+        "missing_api_key",
+        "provider_quota_or_rate_limit",
+        "provider_timeout",
+        "malformed_provider_output",
+        "schema_validation_failure",
+        "transcription_failure",
+        "ocr_failure",
+        "visual_analysis_failure",
+        "cleanup_failure"
+      ],
+      "title": "ErrorCode",
+      "type": "string"
+    },
+    "EvidenceItem": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "evidence_id": {
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "modality": {
+          "$ref": "#/$defs/Modality"
+        },
+        "evidence_type": {
+          "title": "Evidence Type",
+          "type": "string"
+        },
+        "start_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Ms"
+        },
+        "end_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Ms"
+        },
+        "text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Text"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "source_reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Reference"
+        },
+        "frame_reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frame Reference"
+        },
+        "bounding_box": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BoundingBox"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "language": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Language"
+        },
+        "entities": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Entities",
+          "type": "array"
+        },
+        "attributes": {
+          "additionalProperties": true,
+          "title": "Attributes",
+          "type": "object"
+        },
+        "uncertainty": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uncertainty"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string"
+        },
+        "processing_version": {
+          "title": "Processing Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "modality",
+        "evidence_type",
+        "confidence",
+        "provider",
+        "processing_version"
+      ],
+      "title": "EvidenceItem",
+      "type": "object"
+    },
+    "Modality": {
+      "enum": [
+        "speech",
+        "screen_text",
+        "visual_event",
+        "audio_event",
+        "metadata"
+      ],
+      "title": "Modality",
+      "type": "string"
+    },
+    "Platform": {
+      "enum": [
+        "youtube",
+        "instagram",
+        "tiktok",
+        "local",
+        "synthetic",
+        "unknown"
+      ],
+      "title": "Platform",
+      "type": "string"
+    },
+    "ProcessingProfile": {
+      "enum": [
+        "fast",
+        "balanced",
+        "deep",
+        "screen_heavy",
+        "visual_demonstration",
+        "lecture",
+        "engineering"
+      ],
+      "title": "ProcessingProfile",
+      "type": "string"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "uri": {
+          "title": "Uri",
+          "type": "string"
+        },
+        "kind": {
+          "default": "synthetic_evidence",
+          "title": "Kind",
+          "type": "string"
+        },
+        "authorized": {
+          "default": true,
+          "title": "Authorized",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "uri"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "StructuredError": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "retryable": {
+          "default": false,
+          "title": "Retryable",
+          "type": "boolean"
+        },
+        "safe_recovery_action": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Safe Recovery Action"
+        },
+        "internal_context": {
+          "additionalProperties": true,
+          "title": "Internal Context",
+          "type": "object"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "StructuredError",
+      "type": "object"
+    },
+    "TimelineSegment": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "segment_id": {
+          "title": "Segment Id",
+          "type": "string"
+        },
+        "start_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Ms"
+        },
+        "end_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End Ms"
+        },
+        "topic": {
+          "title": "Topic",
+          "type": "string"
+        },
+        "speech_evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Speech Evidence",
+          "type": "array"
+        },
+        "screen_text_evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Screen Text Evidence",
+          "type": "array"
+        },
+        "visual_evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Visual Evidence",
+          "type": "array"
+        },
+        "audio_evidence": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Audio Evidence",
+          "type": "array"
+        },
+        "entities": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Entities",
+          "type": "array"
+        },
+        "claims": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Claims",
+          "type": "array"
+        },
+        "contradictions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Contradictions",
+          "type": "array"
+        },
+        "importance_score": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Importance Score",
+          "type": "number"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "segment_id",
+        "topic",
+        "importance_score",
+        "confidence"
+      ],
+      "title": "TimelineSegment",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "analysis_id": {
+      "title": "Analysis Id",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/Source"
+    },
+    "platform": {
+      "$ref": "#/$defs/Platform"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "duration_ms": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Duration Ms"
+    },
+    "detected_languages": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Detected Languages",
+      "type": "array"
+    },
+    "processing_profile": {
+      "$ref": "#/$defs/ProcessingProfile"
+    },
+    "acquisition_diagnostic": {
+      "$ref": "#/$defs/AcquisitionDiagnostic"
+    },
+    "one_sentence_takeaway": {
+      "title": "One Sentence Takeaway",
+      "type": "string"
+    },
+    "concise_summary": {
+      "title": "Concise Summary",
+      "type": "string"
+    },
+    "detailed_summary": {
+      "title": "Detailed Summary",
+      "type": "string"
+    },
+    "chapters": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Chapters",
+      "type": "array"
+    },
+    "key_points": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Key Points",
+      "type": "array"
+    },
+    "important_screen_only_information": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Important Screen Only Information",
+      "type": "array"
+    },
+    "visual_demonstrations": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Visual Demonstrations",
+      "type": "array"
+    },
+    "technical_values": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Technical Values",
+      "type": "array"
+    },
+    "people_organizations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "People Organizations",
+      "type": "array"
+    },
+    "products_tools_technologies": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Products Tools Technologies",
+      "type": "array"
+    },
+    "action_items": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Action Items",
+      "type": "array"
+    },
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "contradictions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Contradictions",
+      "type": "array"
+    },
+    "uncertainties": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Uncertainties",
+      "type": "array"
+    },
+    "evidence_items": {
+      "items": {
+        "$ref": "#/$defs/EvidenceItem"
+      },
+      "title": "Evidence Items",
+      "type": "array"
+    },
+    "timeline_segments": {
+      "items": {
+        "$ref": "#/$defs/TimelineSegment"
+      },
+      "title": "Timeline Segments",
+      "type": "array"
+    },
+    "coverage_report": {
+      "$ref": "#/$defs/CoverageReport"
+    },
+    "processing_warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Processing Warnings",
+      "type": "array"
+    },
+    "errors": {
+      "items": {
+        "$ref": "#/$defs/StructuredError"
+      },
+      "title": "Errors",
+      "type": "array"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "source",
+    "platform",
+    "title",
+    "detected_languages",
+    "processing_profile",
+    "acquisition_diagnostic",
+    "one_sentence_takeaway",
+    "concise_summary",
+    "detailed_summary",
+    "claims",
+    "contradictions",
+    "uncertainties",
+    "evidence_items",
+    "timeline_segments",
+    "coverage_report"
+  ],
+  "title": "AnalysisResult",
+  "type": "object"
+}

@@ -1,0 +1,1 @@
+{"title":"Screen only","evidence_items":[{"evidence_id":"screen-1","modality":"screen_text","evidence_type":"warning","start_ms":100,"end_ms":2000,"text":"Overtemperature warning: 85 °C","confidence":0.96,"provider":"fake","processing_version":"1"}]}

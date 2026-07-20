@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Multimodal Video Intelligence",
+  "version": "0.1.0",
+  "description": "Displays platform and visible video metadata; recording is not implemented.",
+  "permissions": ["activeTab", "sidePanel"],
+  "background": { "service_worker": "service-worker.js", "type": "module" },
+  "action": { "default_title": "Open Video Intelligence" },
+  "side_panel": { "default_path": "src/side-panel/index.html" },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.youtube.com/*",
+        "https://youtu.be/*",
+        "https://*.instagram.com/*",
+        "https://*.tiktok.com/*"
+      ],
+      "js": ["content-script.js"]
+    }
+  ]
+}
