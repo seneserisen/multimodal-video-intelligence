@@ -24,6 +24,8 @@ python -m ruff format --check .
 python -m mypy backend/src
 python -m video_intelligence.cli analyze-evidence --input tests/fixtures/contradiction_case.json --profile balanced --output-dir build/example
 python scripts/validate_example.py build/example/analysis.json schemas/analysis-result.schema.json
+# Requires local ffprobe and user-authorised media:
+python -m video_intelligence.cli inspect-media --input <video.mp4> --output build/media-report.json --confirm-authorized
 ```
 
 From `extension`:

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
+from video_intelligence.media.models import MediaProbeResult
 from video_intelligence.models import AcquisitionDiagnostic, AnalysisResult, EvidenceItem
 
 
@@ -13,6 +14,7 @@ def test_checked_in_schemas_match_models() -> None:
         "analysis-result.schema.json": AnalysisResult.model_json_schema(),
         "evidence-item.schema.json": EvidenceItem.model_json_schema(),
         "acquisition-diagnostic.schema.json": AcquisitionDiagnostic.model_json_schema(),
+        "media-probe-result.schema.json": MediaProbeResult.model_json_schema(),
     }
     for name, generated in expected.items():
         checked_in = json.loads((root / "schemas" / name).read_text(encoding="utf-8"))

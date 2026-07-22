@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from video_intelligence.media.models import MediaProbeResult
 from video_intelligence.models import AcquisitionDiagnostic, AnalysisResult, EvidenceItem
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +14,7 @@ def main() -> None:
         "analysis-result.schema.json": AnalysisResult.model_json_schema(),
         "evidence-item.schema.json": EvidenceItem.model_json_schema(),
         "acquisition-diagnostic.schema.json": AcquisitionDiagnostic.model_json_schema(),
+        "media-probe-result.schema.json": MediaProbeResult.model_json_schema(),
     }
     target = ROOT / "schemas"
     target.mkdir(exist_ok=True)

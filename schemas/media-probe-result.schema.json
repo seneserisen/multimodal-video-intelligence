@@ -1,0 +1,263 @@
+{
+  "$defs": {
+    "ErrorCode": {
+      "enum": [
+        "invalid_url",
+        "unsupported_platform",
+        "unavailable_media",
+        "direct_provider_failure",
+        "extractor_failure",
+        "tab_capture_failure",
+        "missing_audio",
+        "missing_video",
+        "silent_capture",
+        "black_capture",
+        "frozen_video",
+        "incomplete_recording",
+        "unsupported_codec",
+        "ffmpeg_unavailable",
+        "provider_unavailable",
+        "missing_api_key",
+        "provider_quota_or_rate_limit",
+        "provider_timeout",
+        "malformed_provider_output",
+        "schema_validation_failure",
+        "transcription_failure",
+        "ocr_failure",
+        "visual_analysis_failure",
+        "cleanup_failure"
+      ],
+      "title": "ErrorCode",
+      "type": "string"
+    },
+    "MediaStream": {
+      "additionalProperties": false,
+      "properties": {
+        "index": {
+          "minimum": 0,
+          "title": "Index",
+          "type": "integer"
+        },
+        "stream_type": {
+          "enum": [
+            "video",
+            "audio",
+            "subtitle",
+            "data",
+            "attachment",
+            "unknown"
+          ],
+          "title": "Stream Type",
+          "type": "string"
+        },
+        "codec_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Codec Name"
+        },
+        "duration_ms": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration Ms"
+        },
+        "width": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Width"
+        },
+        "height": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Height"
+        },
+        "frame_rate": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frame Rate"
+        },
+        "sample_rate_hz": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sample Rate Hz"
+        },
+        "channels": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Channels"
+        }
+      },
+      "required": [
+        "index",
+        "stream_type"
+      ],
+      "title": "MediaStream",
+      "type": "object"
+    },
+    "StructuredError": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "code": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "retryable": {
+          "default": false,
+          "title": "Retryable",
+          "type": "boolean"
+        },
+        "safe_recovery_action": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Safe Recovery Action"
+        },
+        "internal_context": {
+          "additionalProperties": true,
+          "title": "Internal Context",
+          "type": "object"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "title": "StructuredError",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "path": {
+      "title": "Path",
+      "type": "string"
+    },
+    "file_size_bytes": {
+      "minimum": 0,
+      "title": "File Size Bytes",
+      "type": "integer"
+    },
+    "format_names": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Format Names",
+      "type": "array"
+    },
+    "duration_ms": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Duration Ms"
+    },
+    "streams": {
+      "items": {
+        "$ref": "#/$defs/MediaStream"
+      },
+      "title": "Streams",
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "errors": {
+      "items": {
+        "$ref": "#/$defs/StructuredError"
+      },
+      "title": "Errors",
+      "type": "array"
+    }
+  },
+  "required": [
+    "path",
+    "file_size_bytes",
+    "format_names",
+    "streams"
+  ],
+  "title": "MediaProbeResult",
+  "type": "object"
+}

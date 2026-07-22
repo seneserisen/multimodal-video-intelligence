@@ -6,8 +6,8 @@ Untrusted URLs, filenames, media, provider output, and browser messages may atte
 
 ## Controls
 
-Use typed validation, resolved paths constrained to intended roots, subprocess argument arrays, loopback-only authenticated services, environment/OS secret storage, explicit size and duration limits, and per-session temporary directories cleaned on success and failure. The extension requests only `activeTab`, `scripting`, and `sidePanel`; it does not read cookies or transmit media. Cloud processing must be labelled and requires an explicit privacy warning.
+Use typed validation, resolved paths constrained to intended roots, subprocess argument arrays with `shell=False`, loopback-only authenticated services, environment/OS secret storage, explicit size and duration limits, and per-session temporary directories cleaned on success and failure. Local media inspection requires explicit authorization confirmation. The extension requests only `activeTab` and `sidePanel`; it does not read cookies or transmit media. Cloud processing must be labelled and requires an explicit privacy warning.
 
 ## Remaining risks
 
-Browser capture, cleanup under process termination, hostile codecs, provider retention, and secure local transport are not implemented or validated in Milestone 1. Users must confirm ownership or authorisation before future media processing.
+Browser capture, signal-level media validation, cleanup under process termination, hostile decoder behavior, provider retention, and secure local transport are not implemented or validated. `ffprobe` remains an external parser and should be kept patched. Users must confirm ownership or authorisation before media processing.
