@@ -6,6 +6,8 @@ Milestone 1 accepts deterministic evidence JSON rather than acquiring real media
 
 Milestone 2A adds safe local media inspection through `ffprobe`: path, extension, size, duration, stream, dimension, frame-rate, and codec validation with versioned structured diagnostics. It does not yet decode frames, detect silence/black/frozen video, capture browser media, or invoke AI providers.
 
+Milestone 2B adds an authenticated loopback command center with a local dashboard and lifecycle, prerequisite, and explicit source-update commands. It binds only to `127.0.0.1`, uses a random token per run, and does not auto-update or expose a remote service.
+
 ## Quick start
 
 Requires Python 3.12+ and Node.js 20+. FFmpeg/ffprobe is optional for the deterministic evidence pipeline and required only for real local media inspection.
@@ -24,6 +26,16 @@ With a local `ffprobe` installation and media you are authorised to process:
 
 ```powershell
 python -m video_intelligence.cli inspect-media --input video.mp4 --output build/media-report.json --confirm-authorized
+```
+
+Start and manage the local command center:
+
+```powershell
+python -m video_intelligence.cli doctor
+python -m video_intelligence.cli start
+python -m video_intelligence.cli status
+python -m video_intelligence.cli stop
+python -m video_intelligence.cli update
 ```
 
 No live AI service is called. See [docs/TESTING.md](docs/TESTING.md) and [docs/SECURITY_PRIVACY.md](docs/SECURITY_PRIVACY.md).

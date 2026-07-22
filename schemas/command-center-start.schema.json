@@ -1,0 +1,105 @@
+{
+  "$defs": {
+    "CommandCenterStatus": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "default": "1.0.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "running": {
+          "title": "Running",
+          "type": "boolean"
+        },
+        "pid": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pid"
+        },
+        "host": {
+          "const": "127.0.0.1",
+          "default": "127.0.0.1",
+          "title": "Host",
+          "type": "string"
+        },
+        "port": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 65535,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Port"
+        },
+        "started_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Started At"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "running",
+        "version",
+        "message"
+      ],
+      "title": "CommandCenterStatus",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "$ref": "#/$defs/CommandCenterStatus"
+    },
+    "dashboard_url": {
+      "title": "Dashboard Url",
+      "type": "string"
+    },
+    "already_running": {
+      "default": false,
+      "title": "Already Running",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "status",
+    "dashboard_url"
+  ],
+  "title": "StartResult",
+  "type": "object"
+}

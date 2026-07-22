@@ -31,6 +31,10 @@ class ErrorCode(StrEnum):
     OCR_FAILURE = "ocr_failure"
     VISUAL_ANALYSIS_FAILURE = "visual_analysis_failure"
     CLEANUP_FAILURE = "cleanup_failure"
+    COMMAND_CENTER_UNAVAILABLE = "command_center_unavailable"
+    COMMAND_CENTER_ALREADY_RUNNING = "command_center_already_running"
+    UPDATE_UNAVAILABLE = "update_unavailable"
+    DIRTY_WORKTREE = "dirty_worktree"
 
 
 class StructuredError(BaseModel):

@@ -26,6 +26,11 @@ python -m video_intelligence.cli analyze-evidence --input tests/fixtures/contrad
 python scripts/validate_example.py build/example/analysis.json schemas/analysis-result.schema.json
 # Requires local ffprobe and user-authorised media:
 python -m video_intelligence.cli inspect-media --input <video.mp4> --output build/media-report.json --confirm-authorized
+python -m video_intelligence.cli doctor
+python -m video_intelligence.cli start
+python -m video_intelligence.cli status
+python -m video_intelligence.cli stop
+python -m video_intelligence.cli update
 ```
 
 From `extension`:

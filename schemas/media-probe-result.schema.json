@@ -25,7 +25,11 @@
         "transcription_failure",
         "ocr_failure",
         "visual_analysis_failure",
-        "cleanup_failure"
+        "cleanup_failure",
+        "command_center_unavailable",
+        "command_center_already_running",
+        "update_unavailable",
+        "dirty_worktree"
       ],
       "title": "ErrorCode",
       "type": "string"
