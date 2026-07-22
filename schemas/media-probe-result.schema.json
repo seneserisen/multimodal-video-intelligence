@@ -179,11 +179,6 @@
           ],
           "default": null,
           "title": "Safe Recovery Action"
-        },
-        "internal_context": {
-          "additionalProperties": true,
-          "title": "Internal Context",
-          "type": "object"
         }
       },
       "required": [
@@ -250,13 +245,31 @@
       },
       "title": "Errors",
       "type": "array"
+    },
+    "has_video": {
+      "readOnly": true,
+      "title": "Has Video",
+      "type": "boolean"
+    },
+    "has_audio": {
+      "readOnly": true,
+      "title": "Has Audio",
+      "type": "boolean"
+    },
+    "valid": {
+      "readOnly": true,
+      "title": "Valid",
+      "type": "boolean"
     }
   },
   "required": [
     "path",
     "file_size_bytes",
     "format_names",
-    "streams"
+    "streams",
+    "has_video",
+    "has_audio",
+    "valid"
   ],
   "title": "MediaProbeResult",
   "type": "object"

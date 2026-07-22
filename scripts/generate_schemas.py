@@ -14,7 +14,7 @@ def main() -> None:
         "analysis-result.schema.json": AnalysisResult.model_json_schema(),
         "evidence-item.schema.json": EvidenceItem.model_json_schema(),
         "acquisition-diagnostic.schema.json": AcquisitionDiagnostic.model_json_schema(),
-        "media-probe-result.schema.json": MediaProbeResult.model_json_schema(),
+        "media-probe-result.schema.json": MediaProbeResult.model_json_schema(mode="serialization"),
     }
     target = ROOT / "schemas"
     target.mkdir(exist_ok=True)

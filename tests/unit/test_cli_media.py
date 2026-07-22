@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from jsonschema import Draft202012Validator
 from video_intelligence import cli
 from video_intelligence.media.models import MediaProbeResult, MediaStream
 
@@ -50,6 +51,9 @@ def test_inspect_media_cli_writes_versioned_json(
     payload = json.loads(output.read_text(encoding="utf-8"))
     assert payload["schema_version"] == "1.0.0"
     assert payload["valid"] is True
+    schema_path = Path(__file__).parents[2] / "schemas" / "media-probe-result.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    Draft202012Validator(schema).validate(payload)
 
 
 def test_inspect_media_cli_requires_authorization_confirmation(

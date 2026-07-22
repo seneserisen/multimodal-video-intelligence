@@ -14,7 +14,7 @@ def test_checked_in_schemas_match_models() -> None:
         "analysis-result.schema.json": AnalysisResult.model_json_schema(),
         "evidence-item.schema.json": EvidenceItem.model_json_schema(),
         "acquisition-diagnostic.schema.json": AcquisitionDiagnostic.model_json_schema(),
-        "media-probe-result.schema.json": MediaProbeResult.model_json_schema(),
+        "media-probe-result.schema.json": MediaProbeResult.model_json_schema(mode="serialization"),
     }
     for name, generated in expected.items():
         checked_in = json.loads((root / "schemas" / name).read_text(encoding="utf-8"))
