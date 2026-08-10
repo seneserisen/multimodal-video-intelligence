@@ -34,6 +34,7 @@ Common actions:
 | --- | --- | --- |
 | First setup | `SETUP.bat` | `sh setup.sh` |
 | Run demo | `RUN.bat` | `sh run.sh` |
+| Open local app | `COMMAND_CENTER.bat` | `sh command-center.sh` |
 | Diagnose | `DOCTOR.bat` | `sh doctor.sh` |
 | Full tests | `TEST.bat` | `sh test.sh` |
 | Clean outputs | `CLEAN.bat` | `sh clean.sh` |
@@ -45,14 +46,16 @@ Common actions:
 The one-click demo does not require FFmpeg. To inspect video files that you own or are authorized to process, install FFmpeg/ffprobe and use the authenticated local command center:
 
 ```powershell
-.\.venv\Scripts\python.exe -m video_intelligence.cli start
+COMMAND_CENTER.bat
 ```
 
 The service binds only to `127.0.0.1`, does not call cloud providers, and deletes temporary uploaded media after validation. Stop it from the dashboard or run:
 
 ```powershell
-.\.venv\Scripts\python.exe -m video_intelligence.cli stop
+COMMAND_CENTER.bat stop
 ```
+
+`COMMAND_CENTER.bat status` checks the app without opening it. `COMMAND_CENTER.bat update` checks for source updates but does not modify the checkout; applying an available fast-forward update requires the app to be stopped and the explicit `COMMAND_CENTER.bat update -Apply` command.
 
 ## Advanced and developer usage
 

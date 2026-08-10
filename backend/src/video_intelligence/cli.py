@@ -126,12 +126,20 @@ def _start(args: argparse.Namespace) -> int:
         open_browser=not args.no_open,
         max_upload_bytes=args.max_upload_mb * 1024**2,
     )
+    public_dashboard_url = f"http://{result.status.host}:{result.status.port}/"
     if args.json:
-        print(json.dumps(result.model_dump(mode="json"), indent=2))
+        payload = result.model_dump(mode="json")
+        payload["dashboard_url"] = public_dashboard_url
+        print(json.dumps(payload, indent=2))
     else:
         prefix = "Already running" if result.already_running else "Started"
         print(f"{prefix}: {result.status.host}:{result.status.port}")
-        print(f"Dashboard: {result.dashboard_url}")
+        print(f"Dashboard: {public_dashboard_url}")
+        if args.no_open:
+            print(
+                "Authentication token hidden; run start again without --no-open "
+                "to open the dashboard."
+            )
     return 0
 
 

@@ -15,11 +15,13 @@ def test_portfolio_entry_points_are_present_and_documented() -> None:
         "START_HERE.md",
         "SETUP.bat",
         "RUN.bat",
+        "COMMAND_CENTER.bat",
         "TEST.bat",
         "DOCTOR.bat",
         "CLEAN.bat",
         "setup.sh",
         "run.sh",
+        "command-center.sh",
         "test.sh",
         "doctor.sh",
         "clean.sh",
@@ -35,11 +37,13 @@ def test_root_launchers_are_thin_wrappers() -> None:
     mapping = {
         "SETUP.bat": "scripts\\setup.ps1",
         "RUN.bat": "scripts\\run.ps1",
+        "COMMAND_CENTER.bat": "scripts\\command-center.ps1",
         "TEST.bat": "scripts\\test.ps1",
         "DOCTOR.bat": "scripts\\doctor.ps1",
         "CLEAN.bat": "scripts\\clean.ps1",
         "setup.sh": "scripts/setup.sh",
         "run.sh": "scripts/run.sh",
+        "command-center.sh": "scripts/command-center.sh",
         "test.sh": "scripts/test.sh",
         "doctor.sh": "scripts/doctor.sh",
         "clean.sh": "scripts/clean.sh",
@@ -55,10 +59,12 @@ def test_launchers_do_not_publish_or_stage_changes() -> None:
     for name in (
         "setup.ps1",
         "run.ps1",
+        "command-center.ps1",
         "test.ps1",
         "clean.ps1",
         "setup.sh",
         "run.sh",
+        "command-center.sh",
         "test.sh",
         "clean.sh",
     ):
@@ -73,6 +79,17 @@ def test_demo_uses_existing_cli_and_ignored_artifact_directory() -> None:
         assert "contradiction_case.json" in content
         assert "validate_example.py" in content
     assert "artifacts/" in text(".gitignore").splitlines()
+
+
+def test_command_center_launcher_exposes_explicit_safe_actions() -> None:
+    powershell = text("scripts/command-center.ps1")
+    shell = text("scripts/command-center.sh")
+    for content in (powershell, shell):
+        assert "video_intelligence.cli" in content
+        for action in ("start", "status", "stop", "update"):
+            assert action in content
+    assert 'if ($Action -eq "update" -and $Apply)' in powershell
+    assert "--apply" in powershell
 
 
 def test_cleanup_targets_only_generated_repository_paths() -> None:

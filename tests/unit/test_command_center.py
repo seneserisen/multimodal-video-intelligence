@@ -76,7 +76,18 @@ def test_cli_lifecycle_dispatches_without_real_processes(
     monkeypatch.setattr(cli, "command_center_start", lambda **_kwargs: start)
     monkeypatch.setattr(sys, "argv", ["video-intelligence", "start", "--no-open", "--json"])
     assert cli.main() == 0
-    assert json.loads(capsys.readouterr().out)["status"]["running"] is True
+    json_output = capsys.readouterr().out
+    json_result = json.loads(json_output)
+    assert json_result["status"]["running"] is True
+    assert json_result["dashboard_url"] == "http://127.0.0.1:4567/"
+    assert "hidden" not in json_output
+
+    monkeypatch.setattr(sys, "argv", ["video-intelligence", "start", "--no-open"])
+    assert cli.main() == 0
+    plain_output = capsys.readouterr().out
+    assert "Dashboard: http://127.0.0.1:4567/" in plain_output
+    assert "Authentication token hidden" in plain_output
+    assert "#token=" not in plain_output
 
     monkeypatch.setattr(cli, "command_center_status", lambda: running)
     monkeypatch.setattr(sys, "argv", ["video-intelligence", "status"])

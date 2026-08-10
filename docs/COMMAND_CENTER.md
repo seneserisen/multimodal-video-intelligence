@@ -2,6 +2,18 @@
 
 The command center is a small authenticated service for operating a source checkout and running temporary local media-validation jobs. It is not a public website or remote processing API. It binds only to `127.0.0.1`, chooses a random port unless one is requested, and stores per-run state in the current user's temporary directory.
 
+From the repository root, double-click `COMMAND_CENTER.bat` to set up the project if needed, start the service, and open the local dashboard. The same launcher exposes explicit lifecycle actions:
+
+```powershell
+COMMAND_CENTER.bat start
+COMMAND_CENTER.bat status
+COMMAND_CENTER.bat stop
+COMMAND_CENTER.bat update
+COMMAND_CENTER.bat update -Apply
+```
+
+On Linux or macOS, use `sh command-center.sh` with the same action names and `--apply` for an update. The launcher is only a thin wrapper around the CLI below; it does not run a background updater or publish source changes.
+
 ```powershell
 python -m video_intelligence.cli doctor
 python -m video_intelligence.cli start
