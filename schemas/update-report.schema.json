@@ -1,0 +1,51 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "repository": {
+      "title": "Repository",
+      "type": "string"
+    },
+    "branch": {
+      "title": "Branch",
+      "type": "string"
+    },
+    "upstream": {
+      "title": "Upstream",
+      "type": "string"
+    },
+    "ahead": {
+      "minimum": 0,
+      "title": "Ahead",
+      "type": "integer"
+    },
+    "behind": {
+      "minimum": 0,
+      "title": "Behind",
+      "type": "integer"
+    },
+    "applied": {
+      "title": "Applied",
+      "type": "boolean"
+    },
+    "message": {
+      "title": "Message",
+      "type": "string"
+    }
+  },
+  "required": [
+    "repository",
+    "branch",
+    "upstream",
+    "ahead",
+    "behind",
+    "applied",
+    "message"
+  ],
+  "title": "UpdateReport",
+  "type": "object"
+}

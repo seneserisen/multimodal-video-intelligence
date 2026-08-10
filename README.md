@@ -1,25 +1,30 @@
 # Multimodal Video Intelligence
 
-This project explores how speech, visible text, visual events and relevant audio events can be combined into one timestamped evidence record instead of reducing a video to a transcript alone.
+This local-first project combines speech, visible text, visual events, and relevant audio evidence into one timestamped record instead of reducing a video to a transcript alone.
 
-The current release is deliberately a foundation. It processes deterministic evidence JSON and includes a non-recording Chrome extension scaffold; it does not yet capture or analyse real media.
+## 60-second demonstration
 
-## What the foundation does
+For a non-technical Windows walkthrough, read [START_HERE.md](START_HERE.md), double-click `SETUP.bat` once, then double-click `RUN.bat`. The deterministic report appears in `artifacts/demo/` and uses no network, private media, paid API, or live AI provider.
 
-- validates typed evidence items and stable JSON interchange schemas;
-- accepts speech, OCR, visual and audio evidence with integer-millisecond timestamps;
-- groups nearby evidence into timeline segments;
-- removes duplicated speech/subtitle content;
-- identifies simple confirmation and contradiction relationships;
-- scores importance while preserving uncertainty and provenance;
-- exports schema-valid JSON and readable Markdown;
-- uses replaceable provider interfaces with deterministic fake providers;
-- includes a Chrome Manifest V3 scaffold that detects supported platforms and visible video metadata;
-- keeps acquisition quality separate from analysis quality.
+Linux/macOS users can run `./setup.sh` followed by `./run.sh`.
+
+## What is implemented
+
+- typed evidence items and stable JSON interchange schemas;
+- speech, OCR, visual, and audio evidence with integer-millisecond timestamps;
+- temporal grouping, speech/subtitle deduplication, importance scoring, uncertainty, and provenance;
+- simple multimodal confirmation and contradiction relationships;
+- evidence-backed JSON and Markdown export;
+- safe local `ffprobe` metadata validation for authorized media;
+- an authenticated `127.0.0.1` command center with temporary validation jobs;
+- bounded uploads, true active-job cancellation, in-memory results, and media cleanup;
+- replaceable provider interfaces with deterministic fake providers;
+- a non-recording Chrome Manifest V3 platform and metadata scaffold;
+- one-command setup, demo, diagnostics, tests, and generated-output cleanup.
 
 No live AI service or network call is used by the test suite.
 
-## Example
+## Deterministic CLI example
 
 ```powershell
 python -m pip install -e ".[dev]"
@@ -29,46 +34,56 @@ python -m video_intelligence.cli analyze-evidence `
   --output-dir build/example
 ```
 
-The command writes an evidence-backed analysis JSON file and a Markdown report. The fixtures include speech-only, visual-only, duplicated subtitles, uncertain OCR, contradictions, confirmations, missing timestamps and provider failures.
+The command writes an evidence-backed analysis JSON file and a Markdown report. Fixtures cover speech-only, visual-only, duplicated subtitles, uncertain OCR, contradictions, confirmations, missing timestamps, and provider failures.
 
 ## Architecture
 
 ```text
-evidence input
-     |
-     v
-schema and model validation
-     |
-     v
+authorized input
+      |
+      v
+media and evidence validation
+      |
+      v
 provider boundary
-     |
-     v
+      |
+      v
 temporal grouping and multimodal fusion
-     |
-     v
+      |
+      v
 importance, agreement and contradiction analysis
-     |
-     v
+      |
+      v
 JSON + Markdown export
 
 Chrome MV3 scaffold: platform detection and metadata only
+Command center: authenticated loopback and ephemeral jobs only
 ```
 
-Acquisition, media validation, modality extraction, fusion, summarization, export and cleanup are kept as separate responsibilities. See [Architecture](docs/ARCHITECTURE.md) and the recorded [design decisions](docs/DECISIONS/).
+Acquisition, media validation, modality extraction, fusion, summarization, export, and cleanup remain separate responsibilities. See [Architecture](docs/ARCHITECTURE.md) and the recorded [design decisions](docs/DECISIONS/).
 
 ## Technology
 
 | Layer | Tools |
 | --- | --- |
-| Backend | Python 3.12, Pydantic and typed provider interfaces |
+| Backend | Python 3.12+, Pydantic, typed provider interfaces |
+| Media metadata | Local FFmpeg/ffprobe |
 | Contracts | JSON Schema |
-| Browser scaffold | TypeScript, Chrome Manifest V3 and Vite |
-| Tests | pytest with sockets disabled, Vitest and deterministic fixtures |
-| Static checks | Ruff, strict mypy and ESLint |
+| Local operations | Authenticated standard-library loopback service |
+| Browser scaffold | TypeScript, Chrome Manifest V3, Vite |
+| Tests | pytest with sockets disabled, Vitest, deterministic fixtures |
+| Static checks | Ruff, strict mypy, ESLint |
 
 ## Verification
 
-Backend checks:
+Run the complete repository workflow on Windows:
+
+```powershell
+.\SETUP.bat -RequireExtension
+.\TEST.bat
+```
+
+Or run the engineering commands directly:
 
 ```powershell
 python -m pytest
@@ -76,49 +91,46 @@ python -m ruff check .
 python -m ruff format --check .
 python -m mypy backend/src
 python scripts/validate_example.py build/example/analysis.json schemas/analysis-result.schema.json
-```
-
-Extension checks:
-
-```powershell
 cd extension
-npm install
 npm test
 npm run lint
 npm run build
 ```
 
-The complete procedure and test boundaries are in [Testing](docs/TESTING.md).
+The read-only GitHub Actions workflow executes the launcher contract on Windows and Ubuntu. The complete procedures and test boundaries are in [Testing](docs/TESTING.md).
+
+## Authorized local media
+
+With local `ffprobe` and media you own or are authorized to process:
+
+```powershell
+python -m video_intelligence.cli inspect-media --input video.mp4 --output build/media-report.json --confirm-authorized
+```
+
+Start and manage the authenticated local command center:
+
+```powershell
+python -m video_intelligence.cli doctor
+python -m video_intelligence.cli start
+python -m video_intelligence.cli status
+python -m video_intelligence.cli stop
+python -m video_intelligence.cli update
+```
 
 ## Privacy and safety boundaries
 
-- No cookie export, access-control bypass, CAPTCHA bypass, telemetry or analytics.
-- Provider secrets must never enter extension JavaScript.
+- No cookie export, access-control bypass, CAPTCHA bypass, telemetry, or analytics.
+- Provider secrets never enter extension JavaScript.
 - Tests use fake providers and do not access the network.
-- Real media, credentials and authorization headers must not be logged or committed.
-- Future local services must bind to loopback and require authentication.
-- Any captured session data must have size/duration limits and reliable cleanup.
+- Real media, credentials, and authorization headers are never committed or intentionally logged.
+- The command center binds only to loopback and requires a random bearer token.
+- Uploads have explicit authorization, filename, size, concurrency, and cleanup controls.
+- No launcher automatically stages, commits, pushes, deploys, or updates source files.
 
 See [Security and privacy](docs/SECURITY_PRIVACY.md).
 
-## Roadmap
+## Roadmap and current limits
 
-### In progress
+The project does not yet capture browser media, transcribe speech, run OCR, analyze arbitrary frames or audio events, call live models, retain durable job history, or support production deployment. Planned milestones cover controlled acquisition, replaceable modality providers, adaptive frame selection, signal-quality checks, evidence-linked screenshots, search, question answering, and resumable processing.
 
-A draft branch is developing local media validation and a command-center workflow. It is not part of the default branch and is not described here as complete.
-
-### Later milestones
-
-1. Validate authorised local media and report acquisition quality separately.
-2. Add controlled tab capture without cookie export or access-control workarounds.
-3. Introduce replaceable transcription and OCR providers.
-4. Add adaptive frames, scene/slide changes and relevant-audio analysis.
-5. Support evidence-linked screenshots, search and question answering.
-6. Add resumable long-video processing and confidence-driven reprocessing.
-7. Compare local and hybrid provider modes with explicit privacy/cost reporting.
-
-FFmpeg, real browser recording, OCR, speech recognition and visual-analysis providers are future dependencies, not current capabilities. The broader direction is documented in the [product specification](docs/PRODUCT_SPEC.md) and [roadmap](docs/ROADMAP.md).
-
-## Current limits
-
-The project does not currently acquire real media, call live models, transcribe speech, run OCR, analyse arbitrary video frames or support production deployment. Milestone 1 demonstrates data contracts, deterministic fusion behavior, export and a browser integration boundary.
+See [Project status](docs/PROJECT_STATUS.md), [Roadmap](docs/ROADMAP.md), [Development](docs/DEVELOPMENT.md), and [Troubleshooting](docs/TROUBLESHOOTING.md).

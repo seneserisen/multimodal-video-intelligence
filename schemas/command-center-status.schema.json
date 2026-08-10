@@ -1,0 +1,119 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "running": {
+      "title": "Running",
+      "type": "boolean"
+    },
+    "pid": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Pid"
+    },
+    "host": {
+      "const": "127.0.0.1",
+      "default": "127.0.0.1",
+      "title": "Host",
+      "type": "string"
+    },
+    "port": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 65535,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Port"
+    },
+    "started_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Started At"
+    },
+    "version": {
+      "title": "Version",
+      "type": "string"
+    },
+    "message": {
+      "title": "Message",
+      "type": "string"
+    },
+    "active_jobs": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Active Jobs",
+      "type": "integer"
+    },
+    "completed_jobs": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Completed Jobs",
+      "type": "integer"
+    },
+    "failed_jobs": {
+      "default": 0,
+      "minimum": 0,
+      "title": "Failed Jobs",
+      "type": "integer"
+    },
+    "max_upload_bytes": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Max Upload Bytes"
+    },
+    "max_active_jobs": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Max Active Jobs"
+    }
+  },
+  "required": [
+    "running",
+    "version",
+    "message"
+  ],
+  "title": "CommandCenterStatus",
+  "type": "object"
+}
