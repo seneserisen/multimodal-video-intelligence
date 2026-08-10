@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
+from video_intelligence.command_center.jobs import ProcessingJob, ProcessingJobList
 from video_intelligence.command_center.models import (
     CommandCenterStatus,
     DoctorReport,
@@ -25,6 +26,10 @@ def test_checked_in_schemas_match_models() -> None:
         "command-center-start.schema.json": StartResult.model_json_schema(),
         "doctor-report.schema.json": DoctorReport.model_json_schema(),
         "update-report.schema.json": UpdateReport.model_json_schema(),
+        "processing-job.schema.json": ProcessingJob.model_json_schema(mode="serialization"),
+        "processing-job-list.schema.json": ProcessingJobList.model_json_schema(
+            mode="serialization"
+        ),
     }
     for name, generated in expected.items():
         checked_in = json.loads((root / "schemas" / name).read_text(encoding="utf-8"))

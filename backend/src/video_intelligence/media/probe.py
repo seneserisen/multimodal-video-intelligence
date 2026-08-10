@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 import shutil
 import subprocess
-from collections.abc import Sequence
+import time
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol, cast
@@ -27,11 +28,33 @@ class CommandResult:
 
 
 class CommandRunner(Protocol):
-    def run(self, arguments: Sequence[str], *, timeout_seconds: float) -> CommandResult: ...
+    def run(
+        self,
+        arguments: Sequence[str],
+        *,
+        timeout_seconds: float,
+        cancellation_requested: Callable[[], bool] | None = None,
+    ) -> CommandResult: ...
+
+
+class MediaProbeCancelled(Exception):
+    """Raised after an active local media probe has been terminated."""
 
 
 class SubprocessRunner:
-    def run(self, arguments: Sequence[str], *, timeout_seconds: float) -> CommandResult:
+    def run(
+        self,
+        arguments: Sequence[str],
+        *,
+        timeout_seconds: float,
+        cancellation_requested: Callable[[], bool] | None = None,
+    ) -> CommandResult:
+        if cancellation_requested is not None:
+            return self._run_cancellable(
+                arguments,
+                timeout_seconds=timeout_seconds,
+                cancellation_requested=cancellation_requested,
+            )
         try:
             completed = subprocess.run(
                 list(arguments),
@@ -59,6 +82,53 @@ class SubprocessRunner:
                 )
             ) from exc
         return CommandResult(completed.returncode, completed.stdout, completed.stderr)
+
+    def _run_cancellable(
+        self,
+        arguments: Sequence[str],
+        *,
+        timeout_seconds: float,
+        cancellation_requested: Callable[[], bool],
+    ) -> CommandResult:
+        try:
+            process = subprocess.Popen(
+                list(arguments),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                shell=False,
+                text=True,
+            )
+        except FileNotFoundError as exc:
+            raise VideoIntelligenceError(
+                StructuredError(
+                    code=ErrorCode.FFMPEG_UNAVAILABLE,
+                    message="ffprobe is not installed or is not available on PATH.",
+                    safe_recovery_action="Install FFmpeg locally and ensure ffprobe is on PATH.",
+                )
+            ) from exc
+        deadline = time.monotonic() + timeout_seconds
+        while True:
+            if cancellation_requested():
+                process.kill()
+                process.communicate()
+                raise MediaProbeCancelled
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                process.kill()
+                process.communicate()
+                raise VideoIntelligenceError(
+                    StructuredError(
+                        code=ErrorCode.PROVIDER_TIMEOUT,
+                        message="ffprobe did not finish within the configured timeout.",
+                        retryable=True,
+                        safe_recovery_action="Retry with a smaller local media file.",
+                    )
+                )
+            try:
+                stdout, stderr = process.communicate(timeout=min(0.05, remaining))
+            except subprocess.TimeoutExpired:
+                continue
+            return CommandResult(cast(int, process.returncode), stdout, stderr)
 
 
 def _domain_error(code: ErrorCode, message: str, recovery: str) -> VideoIntelligenceError:
@@ -230,6 +300,7 @@ class FFprobeClient:
         *,
         config: MediaValidationConfig | None = None,
         allowed_root: Path | None = None,
+        cancellation_requested: Callable[[], bool] | None = None,
     ) -> MediaProbeResult:
         config = config or MediaValidationConfig()
         safe_path = _safe_path(path, config, allowed_root)
@@ -249,7 +320,17 @@ class FFprobeClient:
             "json",
             str(safe_path),
         ]
-        completed = self.runner.run(arguments, timeout_seconds=config.subprocess_timeout_seconds)
+        if cancellation_requested is None:
+            completed = self.runner.run(
+                arguments,
+                timeout_seconds=config.subprocess_timeout_seconds,
+            )
+        else:
+            completed = self.runner.run(
+                arguments,
+                timeout_seconds=config.subprocess_timeout_seconds,
+                cancellation_requested=cancellation_requested,
+            )
         if completed.returncode != 0:
             raise _domain_error(
                 ErrorCode.UNAVAILABLE_MEDIA,
@@ -294,5 +375,11 @@ def probe_media(
     *,
     config: MediaValidationConfig | None = None,
     allowed_root: Path | None = None,
+    cancellation_requested: Callable[[], bool] | None = None,
 ) -> MediaProbeResult:
-    return FFprobeClient().probe(path, config=config, allowed_root=allowed_root)
+    return FFprobeClient().probe(
+        path,
+        config=config,
+        allowed_root=allowed_root,
+        cancellation_requested=cancellation_requested,
+    )

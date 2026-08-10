@@ -1,0 +1,85 @@
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+ROOT = Path(__file__).parents[2]
+
+
+def text(path: str) -> str:
+    return (ROOT / path).read_text(encoding="utf-8")
+
+
+def test_portfolio_entry_points_are_present_and_documented() -> None:
+    expected = {
+        "START_HERE.md",
+        "SETUP.bat",
+        "RUN.bat",
+        "TEST.bat",
+        "DOCTOR.bat",
+        "CLEAN.bat",
+        "setup.sh",
+        "run.sh",
+        "test.sh",
+        "doctor.sh",
+        "clean.sh",
+    }
+    assert expected <= {path.name for path in ROOT.iterdir()}
+    guide = text("START_HERE.md")
+    assert "artifacts/demo" in guide
+    assert "DOCTOR.bat" in guide
+    assert "no private video" in guide
+
+
+def test_root_launchers_are_thin_wrappers() -> None:
+    mapping = {
+        "SETUP.bat": "scripts\\setup.ps1",
+        "RUN.bat": "scripts\\run.ps1",
+        "TEST.bat": "scripts\\test.ps1",
+        "DOCTOR.bat": "scripts\\doctor.ps1",
+        "CLEAN.bat": "scripts\\clean.ps1",
+        "setup.sh": "scripts/setup.sh",
+        "run.sh": "scripts/run.sh",
+        "test.sh": "scripts/test.sh",
+        "doctor.sh": "scripts/doctor.sh",
+        "clean.sh": "scripts/clean.sh",
+    }
+    for launcher, target in mapping.items():
+        content = text(launcher)
+        assert target in content
+        assert len(content.splitlines()) <= 7
+
+
+def test_launchers_do_not_publish_or_stage_changes() -> None:
+    mutating_git = re.compile(r"\bgit\s+(?:add|commit|push|pull|merge|reset)\b", re.IGNORECASE)
+    for name in (
+        "setup.ps1",
+        "run.ps1",
+        "test.ps1",
+        "clean.ps1",
+        "setup.sh",
+        "run.sh",
+        "test.sh",
+        "clean.sh",
+    ):
+        assert mutating_git.search(text(f"scripts/{name}")) is None
+
+
+def test_demo_uses_existing_cli_and_ignored_artifact_directory() -> None:
+    powershell = text("scripts/run.ps1")
+    shell = text("scripts/run.sh")
+    for content in (powershell, shell):
+        assert "video_intelligence.cli analyze-evidence" in content
+        assert "contradiction_case.json" in content
+        assert "validate_example.py" in content
+    assert "artifacts/" in text(".gitignore").splitlines()
+
+
+def test_cleanup_targets_only_generated_repository_paths() -> None:
+    powershell = text("scripts/clean.ps1")
+    shell = text("scripts/clean.sh")
+    for content in (powershell, shell):
+        assert "artifacts" in content
+        assert "extension" in content and "dist" in content
+        assert re.search(r"(?:Remove-Item|rm\s+-rf)[^\n]*\.venv", content) is None
+        assert re.search(r"(?:Remove-Item|rm\s+-rf)[^\n]*node_modules", content) is None

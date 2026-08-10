@@ -43,6 +43,7 @@ def _parser() -> argparse.ArgumentParser:
     start.add_argument("--port", type=int, default=0)
     start.add_argument("--no-open", action="store_true")
     start.add_argument("--json", action="store_true")
+    start.add_argument("--max-upload-mb", type=int, default=512)
     status = commands.add_parser("status")
     status.add_argument("--json", action="store_true")
     stop = commands.add_parser("stop")
@@ -117,7 +118,14 @@ def _start(args: argparse.Namespace) -> int:
     if args.port < 0 or args.port > 65535:
         print("Port must be 0 or an integer between 1 and 65535.")
         return 2
-    result = command_center_start(port=args.port, open_browser=not args.no_open)
+    if args.max_upload_mb < 1 or args.max_upload_mb > 5120:
+        print("Maximum upload size must be between 1 and 5120 MiB.")
+        return 2
+    result = command_center_start(
+        port=args.port,
+        open_browser=not args.no_open,
+        max_upload_bytes=args.max_upload_mb * 1024**2,
+    )
     if args.json:
         print(json.dumps(result.model_dump(mode="json"), indent=2))
     else:

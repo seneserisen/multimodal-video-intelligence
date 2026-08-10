@@ -10,7 +10,15 @@ Safe local `ffprobe` execution, typed stream/container metadata, configurable fi
 
 ## Milestone 2B — local command center
 
-Authenticated loopback dashboard, user-scoped runtime state, prerequisite diagnostics, clean start/status/stop lifecycle, and explicit fast-forward-only source update checks. The service exposes health and stop operations only; media processing endpoints remain future work.
+Authenticated loopback dashboard, user-scoped runtime state, prerequisite diagnostics, clean start/status/stop lifecycle, and explicit fast-forward-only source update checks.
+
+## Milestone 3A — ephemeral local jobs
+
+Authenticated, size-bounded dashboard uploads for authorized media; a single local validation worker; in-memory progress and reports; cooperative cancellation; and temporary-media cleanup on every terminal path. Durable history, resume, signal analysis, and multimodal providers remain future work.
+
+## Milestone 3B — developer experience and reproducibility
+
+Idempotent local setup, thin Windows and Unix launchers, a deterministic 60-second demo, actionable workspace diagnostics, isolated artifacts, safe cleanup, developer documentation, and an explicit local-review/commit/push boundary. Fresh Windows setup is exercised locally; Linux/macOS runtime validation remains platform-dependent.
 
 ## Future milestones
 

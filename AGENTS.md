@@ -55,4 +55,4 @@ npm run build
 
 ## Definition of done
 
-A change is done when public interfaces are typed and documented, schema versions are maintained, evidence references validate, security implications are addressed, deterministic tests cover success and failure paths, generated artifacts are isolated, and all relevant commands above have actually run. Report unavailable tools and failed checks exactly; never weaken tests or claim production readiness.
+A change is done when public interfaces are typed and documented, schema versions are maintained, evidence references validate, security implications are addressed, deterministic tests cover success and failure paths, generated artifacts are isolated, and all relevant commands above have actually run. Portfolio-facing changes must also keep `START_HERE.md` accurate, preserve idempotent setup and one-command demo behavior, produce understandable errors and ignored artifacts, and document the deliberate local-review/commit/push boundary. Report unavailable tools, fresh-install assumptions, and failed checks exactly; never weaken tests or claim production readiness.

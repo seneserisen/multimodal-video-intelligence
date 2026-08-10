@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from video_intelligence.command_center.jobs import ProcessingJob, ProcessingJobList
 from video_intelligence.command_center.models import (
     CommandCenterStatus,
     DoctorReport,
@@ -25,6 +26,10 @@ def main() -> None:
         "command-center-start.schema.json": StartResult.model_json_schema(),
         "doctor-report.schema.json": DoctorReport.model_json_schema(),
         "update-report.schema.json": UpdateReport.model_json_schema(),
+        "processing-job.schema.json": ProcessingJob.model_json_schema(mode="serialization"),
+        "processing-job-list.schema.json": ProcessingJobList.model_json_schema(
+            mode="serialization"
+        ),
     }
     target = ROOT / "schemas"
     target.mkdir(exist_ok=True)

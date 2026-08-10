@@ -31,6 +31,11 @@ class CommandCenterStatus(CommandCenterModel):
     started_at: datetime | None = None
     version: str
     message: str
+    active_jobs: int = Field(default=0, ge=0)
+    completed_jobs: int = Field(default=0, ge=0)
+    failed_jobs: int = Field(default=0, ge=0)
+    max_upload_bytes: int | None = Field(default=None, gt=0)
+    max_active_jobs: int | None = Field(default=None, gt=0)
 
 
 class StartResult(CommandCenterModel):

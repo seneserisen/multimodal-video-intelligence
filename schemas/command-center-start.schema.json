@@ -65,6 +65,50 @@
         "message": {
           "title": "Message",
           "type": "string"
+        },
+        "active_jobs": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Active Jobs",
+          "type": "integer"
+        },
+        "completed_jobs": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Completed Jobs",
+          "type": "integer"
+        },
+        "failed_jobs": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Failed Jobs",
+          "type": "integer"
+        },
+        "max_upload_bytes": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Upload Bytes"
+        },
+        "max_active_jobs": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Active Jobs"
         }
       },
       "required": [

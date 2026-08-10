@@ -2,14 +2,22 @@ from __future__ import annotations
 
 import json
 import subprocess
-from collections.abc import Sequence
+import sys
+import threading
+import time
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
 import pytest
 from video_intelligence.errors import ErrorCode, VideoIntelligenceError
 from video_intelligence.media.models import MediaValidationConfig
-from video_intelligence.media.probe import CommandResult, FFprobeClient, SubprocessRunner
+from video_intelligence.media.probe import (
+    CommandResult,
+    FFprobeClient,
+    MediaProbeCancelled,
+    SubprocessRunner,
+)
 
 
 class FakeRunner:
@@ -18,9 +26,16 @@ class FakeRunner:
         self.returncode = returncode
         self.arguments: list[str] = []
 
-    def run(self, arguments: Sequence[str], *, timeout_seconds: float) -> CommandResult:
+    def run(
+        self,
+        arguments: Sequence[str],
+        *,
+        timeout_seconds: float,
+        cancellation_requested: Callable[[], bool] | None = None,
+    ) -> CommandResult:
         self.arguments = list(arguments)
         assert timeout_seconds > 0
+        assert cancellation_requested is None
         return CommandResult(self.returncode, self.stdout, "simulated stderr")
 
 
@@ -140,3 +155,20 @@ def test_subprocess_runner_never_uses_a_shell(monkeypatch: pytest.MonkeyPatch) -
     result = SubprocessRunner().run(["ffprobe", "input.mp4"], timeout_seconds=1)
     assert result.returncode == 0
     assert captured["shell"] is False
+
+
+def test_subprocess_runner_terminates_an_active_cancelled_process() -> None:
+    cancellation = threading.Event()
+    timer = threading.Timer(0.1, cancellation.set)
+    timer.start()
+    started = time.monotonic()
+    try:
+        with pytest.raises(MediaProbeCancelled):
+            SubprocessRunner().run(
+                [sys.executable, "-c", "import time; time.sleep(10)"],
+                timeout_seconds=5,
+                cancellation_requested=cancellation.is_set,
+            )
+    finally:
+        timer.cancel()
+    assert time.monotonic() - started < 2

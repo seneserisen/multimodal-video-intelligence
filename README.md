@@ -2,13 +2,21 @@
 
 A local-first foundation for turning speech, visible text, visual events, and relevant audio events into a timestamped evidence timeline and evidence-backed analysis.
 
+## 60-second demonstration
+
+For a non-technical Windows walkthrough, read [START_HERE.md](START_HERE.md), double-click `SETUP.bat` once, then double-click `RUN.bat`. The deterministic report appears in `artifacts/demo/` and uses no network, private media, paid API, or live AI provider.
+
+Linux/macOS users can run `sh setup.sh` followed by `sh run.sh`.
+
 Milestone 1 accepts deterministic evidence JSON rather than acquiring real media. It validates evidence, groups it temporally, removes duplicated speech/subtitles, identifies simple confirmations and contradictions, scores importance, and exports schema-valid JSON plus Markdown. It also includes a non-recording Chrome MV3 scaffold that detects supported platforms and visible video metadata.
 
 Milestone 2A adds safe local media inspection through `ffprobe`: path, extension, size, duration, stream, dimension, frame-rate, and codec validation with versioned structured diagnostics. It does not yet decode frames, detect silence/black/frozen video, capture browser media, or invoke AI providers.
 
 Milestone 2B adds an authenticated loopback command center with a local dashboard and lifecycle, prerequisite, and explicit source-update commands. It binds only to `127.0.0.1`, uses a random token per run, and does not auto-update or expose a remote service.
 
-## Quick start
+Milestone 3A adds temporary local processing jobs to that dashboard. An authorized video can be uploaded to the loopback service, inspected by one bounded local worker, cancelled, and reviewed without retaining the media. Job metadata and validation results live only for the current command-center run; uploaded bytes are deleted after success, failure, cancellation, or shutdown.
+
+## Developer quick start
 
 Requires Python 3.12+ and Node.js 20+. FFmpeg/ffprobe is optional for the deterministic evidence pipeline and required only for real local media inspection.
 
@@ -38,4 +46,4 @@ python -m video_intelligence.cli stop
 python -m video_intelligence.cli update
 ```
 
-No live AI service is called. See [docs/TESTING.md](docs/TESTING.md) and [docs/SECURITY_PRIVACY.md](docs/SECURITY_PRIVACY.md).
+No live AI service is called. See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md), [docs/TESTING.md](docs/TESTING.md), [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md), and [docs/SECURITY_PRIVACY.md](docs/SECURITY_PRIVACY.md).

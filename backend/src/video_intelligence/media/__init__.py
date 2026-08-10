@@ -3,10 +3,11 @@ from video_intelligence.media.models import (
     MediaStream,
     MediaValidationConfig,
 )
-from video_intelligence.media.probe import FFprobeClient, probe_media
+from video_intelligence.media.probe import FFprobeClient, MediaProbeCancelled, probe_media
 
 __all__ = [
     "FFprobeClient",
+    "MediaProbeCancelled",
     "MediaProbeResult",
     "MediaStream",
     "MediaValidationConfig",

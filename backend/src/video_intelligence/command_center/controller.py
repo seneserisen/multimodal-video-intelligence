@@ -88,7 +88,7 @@ def command_center_status(state_dir: Path | None = None) -> CommandCenterStatus:
     )
 
 
-def _launch_service(state_dir: Path, port: int, token: str) -> None:
+def _launch_service(state_dir: Path, port: int, token: str, max_upload_bytes: int) -> None:
     environment = os.environ.copy()
     environment["VIDEO_INTELLIGENCE_CC_TOKEN"] = token
     arguments = [
@@ -99,6 +99,8 @@ def _launch_service(state_dir: Path, port: int, token: str) -> None:
         str(state_dir),
         "--port",
         str(port),
+        "--max-upload-bytes",
+        str(max_upload_bytes),
     ]
     flags = 0
     if os.name == "nt":
@@ -124,6 +126,7 @@ def command_center_start(
     port: int = 0,
     open_browser: bool = True,
     startup_timeout_seconds: float = 8.0,
+    max_upload_bytes: int = 512 * 1024**2,
 ) -> StartResult:
     directory = prepare_state_dir(state_dir or default_state_dir())
     existing = read_state(directory)
@@ -144,7 +147,7 @@ def command_center_start(
 
     token = secrets.token_urlsafe(32)
     try:
-        _launch_service(directory, port, token)
+        _launch_service(directory, port, token, max_upload_bytes)
     except OSError as exc:
         raise _error(
             ErrorCode.COMMAND_CENTER_UNAVAILABLE,
