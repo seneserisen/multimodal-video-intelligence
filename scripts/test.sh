@@ -19,5 +19,5 @@ if ! command -v npm >/dev/null 2>&1 || [ ! -d "$ROOT/extension/node_modules" ]; 
     printf '%s\n' "TESTS FAILED: extension tools are missing. Run ./setup.sh --require-extension." >&2
     exit 1
 fi
-(cd "$ROOT/extension" && npm test && npm run lint && npm run build && npm audit)
+(cd "$ROOT/extension" && npm test && npm run lint && npm run build)
 printf '\n%s\n' "All project verification completed successfully."

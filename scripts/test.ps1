@@ -36,8 +36,6 @@ try {
             if ($LASTEXITCODE -ne 0) { throw "Extension lint failed." }
             & npm run build
             if ($LASTEXITCODE -ne 0) { throw "Extension build failed." }
-            & npm audit
-            if ($LASTEXITCODE -ne 0) { throw "Extension dependency audit failed." }
         } finally {
             Pop-Location
         }

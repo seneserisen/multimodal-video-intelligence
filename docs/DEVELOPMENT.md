@@ -46,6 +46,8 @@ edit → test → inspect diff → commit → push
 
 No project launcher stages, commits, pushes, pulls, or continuously synchronizes files. `video-intelligence update` is also explicit: without `--apply` it only reports source-update status; applying requires a clean checkout and a fast-forward-only update.
 
+The GitHub Actions workflow runs the same launcher contract on Windows and Ubuntu for pull requests and `main`. It has read-only repository permissions and pins official GitHub actions to immutable commit hashes; it cannot commit or push changes.
+
 Use this repository as an independent Git clone with its own `origin`. Do not place a second Git repository around it.
 
 ## Generated files

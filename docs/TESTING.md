@@ -25,8 +25,9 @@ npm install
 npm test
 npm run lint
 npm run build
-npm audit
 ```
+
+`npm audit` is run manually when refreshing the extension lockfile. It queries the npm registry and is therefore intentionally excluded from the deterministic, network-disabled test launcher.
 
 Media-probe tests inject a deterministic command runner and never execute external binaries. A real `inspect-media` smoke test is environment-dependent and must be reported as blocked when `ffprobe` is absent. Real browser playback, recording, signal-level video/audio validation, OCR, ASR, visual analysis, and provider APIs remain outside the implemented scope.
 

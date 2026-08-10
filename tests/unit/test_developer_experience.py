@@ -83,3 +83,17 @@ def test_cleanup_targets_only_generated_repository_paths() -> None:
         assert "extension" in content and "dist" in content
         assert re.search(r"(?:Remove-Item|rm\s+-rf)[^\n]*\.venv", content) is None
         assert re.search(r"(?:Remove-Item|rm\s+-rf)[^\n]*node_modules", content) is None
+
+
+def test_ci_is_read_only_and_pins_official_actions() -> None:
+    workflow = text(".github/workflows/portfolio-verification.yml")
+    assert "contents: read" in workflow
+    assert "pull_request:" in workflow
+    assert "windows-latest" in workflow and "ubuntu-latest" in workflow
+    uses = re.findall(r"uses:\s+(actions/[^@\s]+)@([^\s]+)", workflow)
+    assert {name for name, _ref in uses} == {
+        "actions/checkout",
+        "actions/setup-node",
+        "actions/setup-python",
+    }
+    assert all(re.fullmatch(r"[0-9a-f]{40}", ref) for _name, ref in uses)
