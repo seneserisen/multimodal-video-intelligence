@@ -104,7 +104,9 @@ def _launch_service(state_dir: Path, port: int, token: str, max_upload_bytes: in
     ]
     flags = 0
     if os.name == "nt":
-        flags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.CREATE_NO_WINDOW
+        flags = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0) | getattr(
+            subprocess, "CREATE_NO_WINDOW", 0
+        )
     with log_path(state_dir).open("ab") as service_log:
         subprocess.Popen(
             arguments,
