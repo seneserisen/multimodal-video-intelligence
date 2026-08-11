@@ -64,6 +64,13 @@ def test_doctor_reports_missing_optional_media_tools(
     assert statuses["ffprobe"] == "warning"
     assert statuses["data_storage"] in {"ok", "warning"}
     assert statuses["transcription"] == "warning"
+    assert statuses["database"] == "warning"
+    assert statuses["backup"] == "warning"
+    assert statuses["faster_whisper_package"] in {"ok", "warning"}
+    assert statuses["model_path"] == "warning"
+    assert statuses["model_ready"] == "warning"
+    assert statuses["model_loadable"] == "warning"
+    assert statuses["real_inference"] == "warning"
 
 
 def test_cli_lifecycle_dispatches_without_real_processes(

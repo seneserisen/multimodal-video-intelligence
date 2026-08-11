@@ -7,6 +7,7 @@ import pytest
 from video_intelligence.errors import ErrorCode, VideoIntelligenceError
 from video_intelligence.media.probe import CommandResult
 from video_intelligence.transcription import AudioExtractor
+from video_intelligence.transcription.config import transcription_runtime_from_environment
 
 
 class FakeAudioRunner:
@@ -63,3 +64,39 @@ def test_audio_extraction_failure_is_structured_and_removes_partial_output(
 
     assert caught.value.detail.code == ErrorCode.TRANSCRIPTION_FAILURE
     assert not destination.exists()
+
+
+def test_runtime_rejects_model_name_and_incomplete_local_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("VIDEO_INTELLIGENCE_WHISPER_MODEL", "tiny")
+    runtime = transcription_runtime_from_environment()
+    assert runtime.provider is None
+    assert runtime.model_ready is False
+    assert "does not exist" in runtime.status
+
+    empty = tmp_path / "model with spaces"
+    empty.mkdir()
+    monkeypatch.setenv("VIDEO_INTELLIGENCE_WHISPER_MODEL", str(empty))
+    runtime = transcription_runtime_from_environment()
+    assert runtime.provider is None
+    assert runtime.model_configured is True
+    assert "model.bin" in runtime.status
+
+
+def test_runtime_rejects_unsupported_device_without_silent_cpu_fallback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    model = tmp_path / "model"
+    model.mkdir()
+    (model / "model.bin").write_bytes(b"model")
+    (model / "config.json").write_text("{}", encoding="utf-8")
+    (model / "tokenizer.json").write_text("{}", encoding="utf-8")
+    monkeypatch.setenv("VIDEO_INTELLIGENCE_WHISPER_MODEL", str(model))
+    monkeypatch.setenv("VIDEO_INTELLIGENCE_WHISPER_DEVICE", "quantum")
+
+    runtime = transcription_runtime_from_environment()
+
+    assert runtime.provider is None
+    assert runtime.device == "quantum"
+    assert "unsupported" in runtime.status

@@ -272,6 +272,9 @@ def test_interrupted_job_recovers_and_transcript_edit_preserves_provenance(
     assert edited.transcription is not None
     segment = edited.transcription.evidence_items[0]
     assert segment.text == "corrected"
-    assert segment.attributes == {"original_text": "original", "user_edited": True}
+    assert segment.attributes["original_text"] == "original"
+    assert segment.attributes["user_edited"] is True
+    assert segment.attributes["edit_count"] == 1
+    assert isinstance(segment.attributes["last_edited_at"], str)
     assert segment.provider == "fake-local"
     manager.shutdown()

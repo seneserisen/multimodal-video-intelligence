@@ -36,8 +36,8 @@ def request(
             body = response.read()
             return response.status, json.loads(body) if body else None
     except urllib.error.HTTPError as exc:
-        exc.read()
-        return exc.code, None
+        body = exc.read()
+        return exc.code, json.loads(body) if body else None
 
 
 def main() -> int:
@@ -92,6 +92,24 @@ def main() -> int:
                 job = refreshed
             retained_media = state_dir / "data" / "media" / job_id
             media_retained_before_delete = retained_media.exists()
+            duplicate_status, duplicate = request(
+                base_url,
+                "/api/jobs",
+                token=token,
+                method="POST",
+                data=media.read_bytes(),
+                headers={
+                    "Content-Type": "application/octet-stream",
+                    "X-Filename": media.name,
+                    "X-MVI-Authorized": "true",
+                },
+            )
+            duplicate_points_to_original = (
+                duplicate_status == 409
+                and duplicate is not None
+                and duplicate.get("existing_job_id") == job_id
+            )
+            retained_copy_count = len(list((state_dir / "data" / "media").glob("*/input.*")))
             removed, _ = request(
                 base_url,
                 f"/api/jobs/{job_id}",
@@ -110,6 +128,9 @@ def main() -> int:
                 "job_status": job["status"],
                 "media_valid": valid,
                 "media_retained_before_delete": media_retained_before_delete,
+                "duplicate_status": duplicate_status,
+                "duplicate_points_to_original": duplicate_points_to_original,
+                "retained_copy_count_after_duplicate": retained_copy_count,
                 "media_removed_after_delete": not retained_media.exists(),
                 "result_remove_status": removed,
             }
@@ -124,6 +145,8 @@ def main() -> int:
                         job["status"] == "succeeded",
                         valid,
                         media_retained_before_delete,
+                        duplicate_points_to_original,
+                        retained_copy_count == 1,
                         not retained_media.exists(),
                         removed == 204,
                     )

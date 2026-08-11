@@ -22,7 +22,7 @@ Idempotent local setup, thin Windows and Unix launchers, a deterministic 60-seco
 
 ## Milestone 4 — real local transcription and durable jobs
 
-User-scoped SQLite job history, retained authorized source media, restart recovery, content hashing and duplicate detection, explicit deletion, cancellation/retry, backup/restore, cancellable FFmpeg audio extraction, optional local Faster-Whisper transcription, detected language, timestamped speech evidence, confidence where supported, and provenance-preserving transcript edits. Models are configured explicitly from local paths and are never downloaded automatically.
+User-scoped SQLite job history, retained authorized source media, restart recovery, content hashing and duplicate detection, explicit deletion, cancellation/retry, backup/restore, cancellable FFmpeg audio extraction, optional local Faster-Whisper transcription, detected language, timestamped speech evidence, confidence where supported, and provenance-preserving transcript edits are implemented and deterministic-tested. Complete local model manifests are required, network fallback is disabled, lazy segment failures/cancellation are handled, and model/device/compute/VAD provenance is retained. Real Faster-Whisper inference, CPU performance, and GPU execution remain unverified because no local model was available for Milestone 4B acceptance; Milestone 4 must not yet be labelled real-transcription validated.
 
 ## Future milestones
 

@@ -406,6 +406,8 @@ class JobManager:
                 attributes = dict(item.attributes)
                 attributes.setdefault("original_text", item.text)
                 attributes["user_edited"] = True
+                attributes["edit_count"] = int(attributes.get("edit_count", 0)) + 1
+                attributes["last_edited_at"] = datetime.now(UTC).isoformat()
                 job.transcription.evidence_items[index] = item.model_copy(
                     update={"text": cleaned, "attributes": attributes}
                 )

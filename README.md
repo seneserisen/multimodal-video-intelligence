@@ -133,6 +133,6 @@ See [Security and privacy](docs/SECURITY_PRIVACY.md).
 
 ## Roadmap and current limits
 
-The project does not yet capture browser media, run OCR, analyze arbitrary frames or audio events, provide multimodal search/Q&A, or support production deployment. Real transcription requires an explicitly installed local provider and local model; no model is bundled or downloaded automatically. Planned milestones cover controlled acquisition, OCR/frame/scene evidence, visual/audio intelligence, search, question answering, and performance hardening.
+The project does not yet capture browser media, run OCR, analyze arbitrary frames or audio events, provide multimodal search/Q&A, or support production deployment. Real transcription requires an explicitly installed local provider and a complete local CTranslate2 model directory containing `model.bin`, `config.json`, and `tokenizer.json`; model names are rejected and no model/tokenizer is downloaded automatically. The provider path is automated-tested, but real local inference remains unverified until a user-supplied local model is accepted successfully.
 
 See [Project status](docs/PROJECT_STATUS.md), [Roadmap](docs/ROADMAP.md), [Development](docs/DEVELOPMENT.md), and [Troubleshooting](docs/TROUBLESHOOTING.md).

@@ -6,7 +6,7 @@
 - Safe local media metadata validation through ffprobe.
 - Authenticated loopback command center with durable local processing jobs.
 - Durable SQLite jobs, retained authorized media, restart recovery, duplicate detection, retry, and explicit deletion.
-- Optional real local transcription with FFmpeg audio extraction, timestamped speech evidence, detected language, and transcript editing.
+- Optional local Faster-Whisper provider with FFmpeg audio extraction, timestamped speech evidence, detected language, strict no-download model validation, lazy-generator safety, model/device/compute/VAD provenance, and edit metadata. This path is automated-tested; real inference is not yet locally validated.
 - Chrome Manifest V3 platform-detection scaffold without provider secrets.
 - Windows one-click setup, demo, doctor, tests, and generated-output cleanup.
 - Linux/macOS shell equivalents with the same user-facing vocabulary.
@@ -22,5 +22,6 @@
 - Live AI-provider integrations.
 - Full resumable stage caching after restart; interrupted jobs currently restart their requested pipeline safely.
 - Production deployment, public hosting, telemetry, or automated GitHub publishing.
+- Real Faster-Whisper acceptance, CPU/GPU performance measurements, and real-provider persistence/backup evidence; no compatible local model was available during Milestone 4B.
 
 The repository is an engineering foundation and reproducible portfolio demonstration, not a production-ready video-analysis product.

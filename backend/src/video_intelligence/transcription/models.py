@@ -13,4 +13,8 @@ class TranscriptionResult(BaseModel):
     processing_version: str
     language: str | None = None
     language_confidence: float | None = Field(default=None, ge=0, le=1)
+    model_identifier: str | None = None
+    device: str | None = None
+    compute_type: str | None = None
+    vad_filter: bool | None = None
     evidence_items: list[EvidenceItem]

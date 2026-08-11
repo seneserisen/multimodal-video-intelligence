@@ -39,9 +39,9 @@ $env:VIDEO_INTELLIGENCE_WHISPER_MODEL = "C:\models\faster-whisper-small"
 OPEN_APP.bat
 ```
 
-The value must be an existing local Faster-Whisper model directory. `VIDEO_INTELLIGENCE_WHISPER_DEVICE` may be `cpu`, `cuda`, or `auto`; `VIDEO_INTELLIGENCE_WHISPER_COMPUTE_TYPE` defaults to `int8`. The application never downloads a model automatically.
+The value must be an existing local Faster-Whisper CTranslate2 model directory containing non-empty `model.bin` plus parseable local `config.json` and `tokenizer.json`. A model name is rejected. `VIDEO_INTELLIGENCE_WHISPER_DEVICE` may be `cpu`, `cuda`, or `auto`; `VIDEO_INTELLIGENCE_WHISPER_COMPUTE_TYPE` defaults to `int8`. Provider initialization also uses `local_files_only=True`, so the application does not download model or tokenizer assets.
 
-A transcription job validates media, extracts mono 16 kHz PCM with cancellable FFmpeg, invokes the explicitly configured local model, and stores timestamped speech evidence with detected language, confidence where supported, provider/method, processing version, and source provenance. User edits change segment text only and retain the original extracted text in provenance attributes.
+A transcription job validates media, extracts mono 16 kHz PCM with cancellable FFmpeg, invokes the explicitly configured local model, fully consumes the lazy segment stream, and stores timestamped speech evidence with detected language, confidence where supported, provider/method/model, device/compute/VAD settings, processing version, and source provenance. User edits retain original extracted text, timestamps, provider/model attribution, edit count, and last-edit time. Cancellation is cooperative before inference and between yielded segments; an internal library operation continues until Faster-Whisper next yields control.
 
 ## Backups
 

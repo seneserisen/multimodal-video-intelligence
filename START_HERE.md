@@ -60,7 +60,7 @@ COMMAND_CENTER.bat stop
 
 `COMMAND_CENTER.bat status` checks the app without opening it. `COMMAND_CENTER.bat update` checks for source updates but does not modify the checkout; applying an available fast-forward update requires the app to be stopped and the explicit `COMMAND_CENTER.bat update -Apply` command.
 
-Validation works with FFmpeg alone. Real transcription is optional and remains local: run `SETUP.bat -Transcription`, place a compatible Faster-Whisper model in a local folder, and set `VIDEO_INTELLIGENCE_WHISPER_MODEL` to that folder before starting the app. The project never downloads a model automatically.
+Validation works with FFmpeg alone. Real transcription is optional and remains local: run `SETUP.bat -Transcription`, place a compatible Faster-Whisper CTranslate2 model containing `model.bin`, `config.json`, and `tokenizer.json` in a local folder, and set `VIDEO_INTELLIGENCE_WHISPER_MODEL` to that folder before starting the app. A model name such as `tiny` is not accepted, and the project never downloads model or tokenizer assets automatically. `DOCTOR.bat` reports package, model manifest, device, and compute readiness separately; it does not run or claim real inference.
 
 ## Advanced and developer usage
 
