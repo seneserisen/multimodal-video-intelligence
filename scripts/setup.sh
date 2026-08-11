@@ -3,7 +3,14 @@ set -eu
 
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 REQUIRE_EXTENSION=0
-[ "${1:-}" = "--require-extension" ] && REQUIRE_EXTENSION=1
+TRANSCRIPTION=0
+for option in "$@"; do
+    case "$option" in
+        --require-extension) REQUIRE_EXTENSION=1 ;;
+        --transcription) TRANSCRIPTION=1 ;;
+        *) printf '%s\n' "Unknown setup option: $option" >&2; exit 2 ;;
+    esac
+done
 
 find_python() {
     for candidate in python3 python; do
@@ -29,7 +36,9 @@ else
 fi
 
 printf '%s\n' "Installing the project and test tools..."
-"$ROOT/.venv/bin/python" -m pip install --disable-pip-version-check -e "$ROOT[dev]"
+EXTRAS=dev
+[ "$TRANSCRIPTION" -eq 1 ] && EXTRAS=dev,transcription
+"$ROOT/.venv/bin/python" -m pip install --disable-pip-version-check -e "$ROOT[$EXTRAS]"
 
 if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1 && [ "$(node -p "Number(process.versions.node.split('.')[0])")" -ge 20 ]; then
     LOCK_HASH=$("$PYTHON" -c 'import hashlib, sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' "$ROOT/extension/package-lock.json")

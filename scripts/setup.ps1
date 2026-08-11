@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [switch]$RequireExtension
+    [switch]$RequireExtension,
+    [switch]$Transcription
 )
 
 $ErrorActionPreference = "Stop"
@@ -37,7 +38,8 @@ try {
     }
 
     Write-Host "Installing the project and test tools..."
-    & $VenvPython -m pip install --disable-pip-version-check -e "${ProjectRoot}[dev]"
+    $extras = if ($Transcription) { "dev,transcription" } else { "dev" }
+    & $VenvPython -m pip install --disable-pip-version-check -e "${ProjectRoot}[$extras]"
     if ($LASTEXITCODE -ne 0) { throw "Python package installation failed." }
 
     $npm = Get-Command npm -ErrorAction SilentlyContinue

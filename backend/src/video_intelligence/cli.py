@@ -14,6 +14,9 @@ from video_intelligence.command_center import (
     run_doctor,
     update_source,
 )
+from video_intelligence.command_center.backup import backup_data, restore_data
+from video_intelligence.command_center.data import default_data_dir
+from video_intelligence.command_center.state import default_state_dir, log_path
 from video_intelligence.config import PipelineConfig, ProcessingProfile
 from video_intelligence.errors import VideoIntelligenceError
 from video_intelligence.export import export_result
@@ -44,6 +47,7 @@ def _parser() -> argparse.ArgumentParser:
     start.add_argument("--no-open", action="store_true")
     start.add_argument("--json", action="store_true")
     start.add_argument("--max-upload-mb", type=int, default=512)
+    start.add_argument("--data-dir", type=Path)
     status = commands.add_parser("status")
     status.add_argument("--json", action="store_true")
     stop = commands.add_parser("stop")
@@ -52,6 +56,13 @@ def _parser() -> argparse.ArgumentParser:
     update.add_argument("--apply", action="store_true")
     update.add_argument("--repository", type=Path, default=Path.cwd())
     update.add_argument("--json", action="store_true")
+    paths = commands.add_parser("paths")
+    paths.add_argument("--json", action="store_true")
+    backup = commands.add_parser("backup")
+    backup.add_argument("--output-dir", type=Path)
+    restore = commands.add_parser("restore")
+    restore.add_argument("--input", type=Path, required=True)
+    restore.add_argument("--confirm", action="store_true")
     return parser
 
 
@@ -125,6 +136,7 @@ def _start(args: argparse.Namespace) -> int:
         port=args.port,
         open_browser=not args.no_open,
         max_upload_bytes=args.max_upload_mb * 1024**2,
+        data_dir=args.data_dir,
     )
     public_dashboard_url = f"http://{result.status.host}:{result.status.port}/"
     if args.json:
@@ -151,6 +163,8 @@ def _status(args: argparse.Namespace) -> int:
         print(f"{'Running' if status.running else 'Stopped'}: {status.message}")
         if status.running:
             print(f"Process {status.pid} on {status.host}:{status.port}")
+            print(f"Data: {status.data_dir or 'unavailable'}")
+            print(f"Transcription: {status.transcription_status or 'unavailable'}")
     return 0 if status.running else 3
 
 
@@ -176,6 +190,45 @@ def _update(args: argparse.Namespace) -> int:
     return 0
 
 
+def _paths(args: argparse.Namespace) -> int:
+    data_dir = default_data_dir()
+    payload = {
+        "project_dir": str(Path.cwd().resolve()),
+        "data_dir": str(data_dir),
+        "results_dir": str(data_dir),
+        "log_path": str(log_path(default_state_dir())),
+    }
+    if args.json:
+        print(json.dumps(payload, indent=2))
+    else:
+        for name, value in payload.items():
+            print(f"{name.replace('_', ' ').title()}: {value}")
+    return 0
+
+
+def _backup(args: argparse.Namespace) -> int:
+    if command_center_status().running:
+        print("Stop the command center before creating a backup.")
+        return 3
+    data_dir = default_data_dir()
+    output_dir = args.output_dir or data_dir.with_name(f"{data_dir.name}Backups")
+    archive = backup_data(data_dir, output_dir)
+    print(f"Backup created: {archive}")
+    return 0
+
+
+def _restore(args: argparse.Namespace) -> int:
+    if not args.confirm:
+        print("Restore requires --confirm because it replaces current local application data.")
+        return 2
+    if command_center_status().running:
+        print("Stop the command center before restoring a backup.")
+        return 3
+    restored = restore_data(args.input, default_data_dir())
+    print(f"Backup restored to: {restored}")
+    return 0
+
+
 def main() -> int:
     args = _parser().parse_args()
     try:
@@ -187,6 +240,9 @@ def main() -> int:
             "status": _status,
             "stop": _stop,
             "update": _update,
+            "paths": _paths,
+            "backup": _backup,
+            "restore": _restore,
         }
         return handlers[args.command](args)
     except VideoIntelligenceError as exc:

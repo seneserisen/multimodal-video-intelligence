@@ -4,12 +4,7 @@ from pathlib import Path
 from typing import Protocol
 
 from video_intelligence.models import AnalysisResult, EvidenceItem
-
-
-class TranscriptionProvider(Protocol):
-    @property
-    def name(self) -> str: ...
-    def transcribe(self, media_path: Path) -> list[EvidenceItem]: ...
+from video_intelligence.transcription import TranscriptionProvider as TranscriptionProvider
 
 
 class OCRProvider(Protocol):

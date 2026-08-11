@@ -13,6 +13,7 @@ from video_intelligence.command_center.models import (
 )
 from video_intelligence.media.models import MediaProbeResult
 from video_intelligence.models import AcquisitionDiagnostic, AnalysisResult, EvidenceItem
+from video_intelligence.transcription import TranscriptionResult
 
 
 def test_checked_in_schemas_match_models() -> None:
@@ -28,6 +29,9 @@ def test_checked_in_schemas_match_models() -> None:
         "update-report.schema.json": UpdateReport.model_json_schema(),
         "processing-job.schema.json": ProcessingJob.model_json_schema(mode="serialization"),
         "processing-job-list.schema.json": ProcessingJobList.model_json_schema(
+            mode="serialization"
+        ),
+        "transcription-result.schema.json": TranscriptionResult.model_json_schema(
             mode="serialization"
         ),
     }

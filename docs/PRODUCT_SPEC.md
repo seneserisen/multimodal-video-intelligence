@@ -4,4 +4,4 @@ The product analyses authorised YouTube, Instagram, and TikTok videos without re
 
 The reliability target is best-effort acquisition for media visibly playable and audible in the user's active Chrome tab. It does not promise universal access and never bypasses access controls. Acquisition quality and analysis quality are reported separately.
 
-Milestone 1 is deliberately limited to deterministic synthetic evidence, validated models, fusion/export, and a non-recording browser scaffold.
+The implemented real-media boundary now includes validated local imports, durable/recoverable jobs, explicit source retention/deletion, and optional local speech transcription. OCR, visual/audio intelligence, search, evidence-backed Q&A, and browser acquisition remain later milestones.

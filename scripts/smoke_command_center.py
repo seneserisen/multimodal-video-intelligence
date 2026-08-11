@@ -90,7 +90,8 @@ def main() -> int:
                 if refreshed is None:
                     raise RuntimeError("processing job disappeared")
                 job = refreshed
-            temporary_media_removed = not (state_dir / "jobs" / job_id).exists()
+            retained_media = state_dir / "data" / "media" / job_id
+            media_retained_before_delete = retained_media.exists()
             removed, _ = request(
                 base_url,
                 f"/api/jobs/{job_id}",
@@ -108,7 +109,8 @@ def main() -> int:
                 "upload_status": accepted,
                 "job_status": job["status"],
                 "media_valid": valid,
-                "temporary_media_removed": temporary_media_removed,
+                "media_retained_before_delete": media_retained_before_delete,
+                "media_removed_after_delete": not retained_media.exists(),
                 "result_remove_status": removed,
             }
             print(json.dumps(result, indent=2))
@@ -121,7 +123,8 @@ def main() -> int:
                         service_status.max_active_jobs == 2,
                         job["status"] == "succeeded",
                         valid,
-                        temporary_media_removed,
+                        media_retained_before_delete,
+                        not retained_media.exists(),
                         removed == 204,
                     )
                 )

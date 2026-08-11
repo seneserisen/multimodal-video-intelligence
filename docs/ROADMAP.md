@@ -20,6 +20,10 @@ Authenticated, size-bounded dashboard uploads for authorized media; a single loc
 
 Idempotent local setup, thin Windows and Unix launchers, a deterministic 60-second demo, actionable workspace diagnostics, isolated artifacts, safe cleanup, developer documentation, and an explicit local-review/commit/push boundary. Fresh Windows setup is exercised locally; Linux/macOS runtime validation remains platform-dependent.
 
+## Milestone 4 — real local transcription and durable jobs
+
+User-scoped SQLite job history, retained authorized source media, restart recovery, content hashing and duplicate detection, explicit deletion, cancellation/retry, backup/restore, cancellable FFmpeg audio extraction, optional local Faster-Whisper transcription, detected language, timestamped speech evidence, confidence where supported, and provenance-preserving transcript edits. Models are configured explicitly from local paths and are never downloaded automatically.
+
 ## Future milestones
 
-The roadmap covers authorised YouTube/Instagram/TikTok URL input, the acquisition fallback ladder, tab capture, automatic transcription and OCR, adaptive frames and scene/slide changes, visual/action and relevant audio analysis, evidence timelines, contradiction detection, screenshots, multimodal search and QA, confidence-driven reprocessing, long-video resume, fingerprints, Markdown/JSON export, local/hybrid modes, secure cleanup, engineering mode, and transparent coverage. Live providers remain optional and replaceable.
+The roadmap covers authorised YouTube/Instagram/TikTok URL input, the acquisition fallback ladder, tab capture, OCR, adaptive frames and scene/slide changes, visual/action and relevant audio analysis, evidence timelines, contradiction detection, screenshots, multimodal search and QA, confidence-driven reprocessing, stage caching, long-video resume, Markdown/JSON export, local/hybrid modes, secure cleanup, engineering mode, and transparent coverage. Live providers remain optional and replaceable.

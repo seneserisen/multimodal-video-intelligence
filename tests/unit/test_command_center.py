@@ -58,7 +58,12 @@ def test_doctor_reports_missing_optional_media_tools(
     monkeypatch.setattr(doctor.shutil, "which", lambda _binary: None)
     report = doctor.run_doctor(tmp_path)
     assert report.ready is True
-    assert [check.status for check in report.checks] == ["ok", "warning", "warning", "warning"]
+    statuses = {check.name: check.status for check in report.checks}
+    assert statuses["python"] == "ok"
+    assert statuses["ffmpeg"] == "warning"
+    assert statuses["ffprobe"] == "warning"
+    assert statuses["data_storage"] in {"ok", "warning"}
+    assert statuses["transcription"] == "warning"
 
 
 def test_cli_lifecycle_dispatches_without_real_processes(
