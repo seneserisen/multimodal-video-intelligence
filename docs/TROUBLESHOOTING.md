@@ -28,6 +28,18 @@ The basic demo still works. Real-media inspection and dashboard upload validatio
 
 That is expected: the bundled demo is deterministic. It intentionally overwrites `artifacts/demo` with the same evidence-backed contradiction result so visitors can reproduce it.
 
+## Transcription is unavailable
+
+Validation-only jobs still work. Run `SETUP.bat -Transcription`, set `VIDEO_INTELLIGENCE_WHISPER_MODEL` to an existing compatible local model directory, then restart the command center. `DOCTOR.bat` reports whether the package and model are ready. The application never downloads a model automatically.
+
+## Local jobs use too much disk space
+
+Imported source media is retained for durable history, retry, and recovery. Use **Delete job + media** in the dashboard to remove an individual source. Run `BACKUP.bat` before deleting anything you may need later. `OPEN_RESULTS.bat` opens the exact local data folder.
+
+## Restore is refused
+
+Stop the command center first and pass both the archive and explicit confirmation: `RESTORE.bat -BackupPath "C:\path\backup.zip" -Confirm`. Unsafe, oversized, unsupported, or corrupt archives are rejected without replacing current data.
+
 ## The command center is already running
 
 Open the existing dashboard or run `video-intelligence status`. Stop it through the dashboard or with `video-intelligence stop`; the project never kills an arbitrary process.

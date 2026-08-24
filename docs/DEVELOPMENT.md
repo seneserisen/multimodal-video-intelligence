@@ -18,6 +18,8 @@ sh test.sh
 
 The setup is idempotent. It creates or reuses `.venv`, installs the Python project in editable mode with development tools, and uses the checked-in npm lockfile for the extension. It does not install Python, Node.js, FFmpeg, Git, browsers, or other system software.
 
+`SETUP.bat -Transcription` (or `sh setup.sh --transcription`) explicitly adds the optional Faster-Whisper runtime. Model files are not dependencies and are never downloaded by setup; point `VIDEO_INTELLIGENCE_WHISPER_MODEL` at a separately obtained, trusted local model directory.
+
 ## Direct engineering commands
 
 The wrappers do not replace the underlying interfaces. From the repository root on Windows:

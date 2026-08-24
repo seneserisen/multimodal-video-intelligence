@@ -16,8 +16,10 @@ Linux/macOS users can run `./setup.sh` followed by `./run.sh`.
 - simple multimodal confirmation and contradiction relationships;
 - evidence-backed JSON and Markdown export;
 - safe local `ffprobe` metadata validation for authorized media;
-- an authenticated `127.0.0.1` command center with temporary validation jobs;
-- bounded uploads, true active-job cancellation, in-memory results, and media cleanup;
+- an authenticated `127.0.0.1` command center with durable SQLite jobs;
+- bounded uploads, content hashing, duplicate detection, cancellation/retry, and restart recovery;
+- explicit local FFmpeg audio extraction and optional Faster-Whisper transcription;
+- timestamped, language-aware speech evidence and provenance-preserving transcript edits;
 - replaceable provider interfaces with deterministic fake providers;
 - a non-recording Chrome Manifest V3 platform and metadata scaffold;
 - one-command setup, demo, diagnostics, tests, and generated-output cleanup.
@@ -57,7 +59,7 @@ importance, agreement and contradiction analysis
 JSON + Markdown export
 
 Chrome MV3 scaffold: platform detection and metadata only
-Command center: authenticated loopback and ephemeral jobs only
+Command center: authenticated loopback, durable local jobs and optional local transcription
 ```
 
 Acquisition, media validation, modality extraction, fusion, summarization, export, and cleanup remain separate responsibilities. See [Architecture](docs/ARCHITECTURE.md) and the recorded [design decisions](docs/DECISIONS/).
@@ -131,6 +133,6 @@ See [Security and privacy](docs/SECURITY_PRIVACY.md).
 
 ## Roadmap and current limits
 
-The project does not yet capture browser media, transcribe speech, run OCR, analyze arbitrary frames or audio events, call live models, retain durable job history, or support production deployment. Planned milestones cover controlled acquisition, replaceable modality providers, adaptive frame selection, signal-quality checks, evidence-linked screenshots, search, question answering, and resumable processing.
+The project does not yet capture browser media, run OCR, analyze arbitrary frames or audio events, provide multimodal search/Q&A, or support production deployment. Real transcription requires an explicitly installed local provider and a complete local CTranslate2 model directory containing `model.bin`, `config.json`, and `tokenizer.json`; model names are rejected and no model/tokenizer is downloaded automatically. The provider path is automated-tested, but real local inference remains unverified until a user-supplied local model is accepted successfully.
 
 See [Project status](docs/PROJECT_STATUS.md), [Roadmap](docs/ROADMAP.md), [Development](docs/DEVELOPMENT.md), and [Troubleshooting](docs/TROUBLESHOOTING.md).

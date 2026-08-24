@@ -34,7 +34,10 @@ Common actions:
 | --- | --- | --- |
 | First setup | `SETUP.bat` | `sh setup.sh` |
 | Run demo | `RUN.bat` | `sh run.sh` |
-| Open local app | `COMMAND_CENTER.bat` | `sh command-center.sh` |
+| Start local service | `START.bat` | `sh command-center.sh start` |
+| Open local app | `OPEN_APP.bat` | `sh command-center.sh start` |
+| Stop / status | `STOP.bat` / `STATUS.bat` | `sh command-center.sh stop` / `status` |
+| Back up local data | `BACKUP.bat` | Advanced CLI only |
 | Diagnose | `DOCTOR.bat` | `sh doctor.sh` |
 | Full tests | `TEST.bat` | `sh test.sh` |
 | Clean outputs | `CLEAN.bat` | `sh clean.sh` |
@@ -49,13 +52,15 @@ The one-click demo does not require FFmpeg. To inspect video files that you own 
 COMMAND_CENTER.bat
 ```
 
-The service binds only to `127.0.0.1`, does not call cloud providers, and deletes temporary uploaded media after validation. Stop it from the dashboard or run:
+The service binds only to `127.0.0.1` and does not call cloud providers. Imported media, job history, validation reports, and transcripts are stored in a user-scoped local data folder until you explicitly delete a job. Stop it from the dashboard or run:
 
 ```powershell
 COMMAND_CENTER.bat stop
 ```
 
 `COMMAND_CENTER.bat status` checks the app without opening it. `COMMAND_CENTER.bat update` checks for source updates but does not modify the checkout; applying an available fast-forward update requires the app to be stopped and the explicit `COMMAND_CENTER.bat update -Apply` command.
+
+Validation works with FFmpeg alone. Real transcription is optional and remains local: run `SETUP.bat -Transcription`, place a compatible Faster-Whisper CTranslate2 model containing `model.bin`, `config.json`, and `tokenizer.json` in a local folder, and set `VIDEO_INTELLIGENCE_WHISPER_MODEL` to that folder before starting the app. A model name such as `tiny` is not accepted, and the project never downloads model or tokenizer assets automatically. `DOCTOR.bat` reports package, model manifest, device, and compute readiness separately; it does not run or claim real inference.
 
 ## Advanced and developer usage
 

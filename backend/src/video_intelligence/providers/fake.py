@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from copy import deepcopy
 from pathlib import Path
 
 from video_intelligence.errors import ErrorCode, StructuredError, VideoIntelligenceError
 from video_intelligence.models import AnalysisResult, EvidenceItem
+from video_intelligence.transcription import TranscriptionResult
 
 
 class DeterministicFakeEvidenceProvider:
@@ -16,8 +18,18 @@ class DeterministicFakeEvidenceProvider:
     def name(self) -> str:
         return self._name
 
-    def transcribe(self, media_path: Path) -> list[EvidenceItem]:
-        return deepcopy(self._evidence)
+    def transcribe(
+        self,
+        audio_path: Path,
+        *,
+        source_reference: str,
+        cancellation_requested: Callable[[], bool],
+    ) -> TranscriptionResult:
+        return TranscriptionResult(
+            provider=self.name,
+            processing_version="fake-1",
+            evidence_items=deepcopy(self._evidence),
+        )
 
     def extract_text(self, media_path: Path) -> list[EvidenceItem]:
         return deepcopy(self._evidence)
@@ -41,7 +53,13 @@ class DeterministicFakeSummarizer:
 class FailingFakeProvider:
     name = "failing-fake-provider"
 
-    def transcribe(self, media_path: Path) -> list[EvidenceItem]:
+    def transcribe(
+        self,
+        audio_path: Path,
+        *,
+        source_reference: str,
+        cancellation_requested: Callable[[], bool],
+    ) -> TranscriptionResult:
         raise VideoIntelligenceError(
             StructuredError(
                 code=ErrorCode.PROVIDER_UNAVAILABLE,

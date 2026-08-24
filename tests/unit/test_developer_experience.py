@@ -33,6 +33,28 @@ def test_portfolio_entry_points_are_present_and_documented() -> None:
     assert "no private video" in guide
 
 
+def test_low_tech_operator_controls_are_present() -> None:
+    expected = {
+        "SETUP.bat",
+        "START.bat",
+        "STOP.bat",
+        "RESTART.bat",
+        "STATUS.bat",
+        "DOCTOR.bat",
+        "TEST.bat",
+        "OPEN_APP.bat",
+        "OPEN_FOLDER.bat",
+        "OPEN_RESULTS.bat",
+        "OPEN_LOGS.bat",
+        "BACKUP.bat",
+        "RESTORE.bat",
+        "UPDATE.bat",
+    }
+    assert expected <= {path.name for path in ROOT.iterdir()}
+    for launcher in expected - {"SETUP.bat", "DOCTOR.bat", "TEST.bat"}:
+        assert "scripts\\control.ps1" in text(launcher)
+
+
 def test_root_launchers_are_thin_wrappers() -> None:
     mapping = {
         "SETUP.bat": "scripts\\setup.ps1",

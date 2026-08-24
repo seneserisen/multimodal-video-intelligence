@@ -36,6 +36,11 @@ class CommandCenterStatus(CommandCenterModel):
     failed_jobs: int = Field(default=0, ge=0)
     max_upload_bytes: int | None = Field(default=None, gt=0)
     max_active_jobs: int | None = Field(default=None, gt=0)
+    data_dir: str | None = None
+    transcription_available: bool = False
+    transcription_provider: str | None = None
+    transcription_model_path: str | None = None
+    transcription_status: str | None = None
 
 
 class StartResult(CommandCenterModel):

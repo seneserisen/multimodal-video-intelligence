@@ -13,6 +13,7 @@ import webbrowser
 from pathlib import Path
 
 from video_intelligence import __version__
+from video_intelligence.command_center.data import default_data_dir, prepare_data_dir
 from video_intelligence.command_center.models import (
     CommandCenterStatus,
     RuntimeState,
@@ -88,7 +89,13 @@ def command_center_status(state_dir: Path | None = None) -> CommandCenterStatus:
     )
 
 
-def _launch_service(state_dir: Path, port: int, token: str, max_upload_bytes: int) -> None:
+def _launch_service(
+    state_dir: Path,
+    data_dir: Path,
+    port: int,
+    token: str,
+    max_upload_bytes: int,
+) -> None:
     environment = os.environ.copy()
     environment["VIDEO_INTELLIGENCE_CC_TOKEN"] = token
     arguments = [
@@ -97,6 +104,8 @@ def _launch_service(state_dir: Path, port: int, token: str, max_upload_bytes: in
         "video_intelligence.command_center.server",
         "--state-dir",
         str(state_dir),
+        "--data-dir",
+        str(data_dir),
         "--port",
         str(port),
         "--max-upload-bytes",
@@ -129,8 +138,10 @@ def command_center_start(
     open_browser: bool = True,
     startup_timeout_seconds: float = 8.0,
     max_upload_bytes: int = 512 * 1024**2,
+    data_dir: Path | None = None,
 ) -> StartResult:
     directory = prepare_state_dir(state_dir or default_state_dir())
+    persistent_data = prepare_data_dir(data_dir or default_data_dir())
     existing = read_state(directory)
     if existing is not None:
         healthy = _healthy_status(existing)
@@ -149,7 +160,7 @@ def command_center_start(
 
     token = secrets.token_urlsafe(32)
     try:
-        _launch_service(directory, port, token, max_upload_bytes)
+        _launch_service(directory, persistent_data, port, token, max_upload_bytes)
     except OSError as exc:
         raise _error(
             ErrorCode.COMMAND_CENTER_UNAVAILABLE,

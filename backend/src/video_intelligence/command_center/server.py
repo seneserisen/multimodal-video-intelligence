@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import secrets
@@ -17,16 +18,21 @@ from video_intelligence.command_center.dashboard import (
     DASHBOARD_HTML,
     DASHBOARD_JS,
 )
+from video_intelligence.command_center.data import prepare_data_dir
 from video_intelligence.command_center.jobs import (
+    DuplicateMediaError,
     JobCapacityError,
     JobManager,
     JobNotFoundError,
     JobStateError,
+    MediaJobProcessor,
     ProcessingJobList,
 )
 from video_intelligence.command_center.models import CommandCenterStatus, RuntimeState
 from video_intelligence.command_center.state import remove_state, write_state
+from video_intelligence.command_center.store import JobStore
 from video_intelligence.media import MediaValidationConfig
+from video_intelligence.transcription.config import transcription_runtime_from_environment
 
 
 class CommandCenterHTTPServer(ThreadingHTTPServer):
@@ -38,6 +44,7 @@ class CommandCenterHTTPServer(ThreadingHTTPServer):
         token: str,
         state_dir: Path,
         max_upload_bytes: int,
+        data_dir: Path | None = None,
     ) -> None:
         super().__init__(address, CommandCenterHandler)
         self.token = token
@@ -45,7 +52,18 @@ class CommandCenterHTTPServer(ThreadingHTTPServer):
         self.started_at = datetime.now(UTC)
         self.max_upload_bytes = max_upload_bytes
         self.media_config = MediaValidationConfig(max_file_size_bytes=max_upload_bytes)
-        self.job_manager = JobManager(state_dir / "jobs")
+        self.data_dir = prepare_data_dir(data_dir or state_dir / "data")
+        self.transcription_runtime = transcription_runtime_from_environment()
+        store = JobStore(self.data_dir / "jobs.sqlite3")
+        processor = MediaJobProcessor(
+            self.data_dir / "work",
+            transcription_provider=self.transcription_runtime.provider,
+        )
+        self.job_manager = JobManager(
+            self.data_dir / "media",
+            processor=processor,
+            store=store,
+        )
 
     def public_status(self) -> CommandCenterStatus:
         active, completed, failed = self.job_manager.counts()
@@ -61,6 +79,11 @@ class CommandCenterHTTPServer(ThreadingHTTPServer):
             failed_jobs=failed,
             max_upload_bytes=self.max_upload_bytes,
             max_active_jobs=self.job_manager.max_active_jobs,
+            data_dir=str(self.data_dir),
+            transcription_available=self.transcription_runtime.provider is not None,
+            transcription_provider=self.transcription_runtime.provider_name,
+            transcription_model_path=self.transcription_runtime.model_path,
+            transcription_status=self.transcription_runtime.status,
         )
 
 
@@ -179,7 +202,57 @@ class CommandCenterHandler(BaseHTTPRequestHandler):
                 return
             self._json(HTTPStatus.OK, job.model_dump(mode="json"))
             return
+        job_id = self._job_id_from_path(path, "/retry")
+        if job_id is not None:
+            try:
+                job = self.server.job_manager.retry(job_id)
+            except JobNotFoundError:
+                self._json(HTTPStatus.NOT_FOUND, {"error": "job_not_found"})
+                return
+            except JobStateError:
+                self._json(HTTPStatus.CONFLICT, {"error": "job_cannot_be_retried"})
+                return
+            self._json(HTTPStatus.ACCEPTED, job.model_dump(mode="json"))
+            return
         self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
+
+    def do_PATCH(self) -> None:
+        path = urlsplit(self.path).path
+        if not self._api_allowed():
+            return
+        parts = path.split("/")
+        if len(parts) != 6 or parts[1:3] != ["api", "jobs"] or parts[4] != "transcript":
+            self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
+            return
+        job_id, evidence_id = parts[3], parts[5]
+        if not job_id or not evidence_id or len(job_id) > 64 or len(evidence_id) > 128:
+            self._json(HTTPStatus.BAD_REQUEST, {"error": "invalid_transcript_reference"})
+            return
+        try:
+            content_length = int(self.headers.get("Content-Length", ""))
+        except ValueError:
+            content_length = -1
+        if content_length <= 0 or content_length > 24_000:
+            self._json(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, {"error": "invalid_edit_size"})
+            return
+        try:
+            payload = json.loads(self.rfile.read(content_length).decode("utf-8"))
+            if not isinstance(payload, dict) or set(payload) != {"text"}:
+                raise ValueError
+            text = payload["text"]
+            if not isinstance(text, str):
+                raise ValueError
+            job = self.server.job_manager.edit_transcript(job_id, evidence_id, text)
+        except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
+            self._json(HTTPStatus.BAD_REQUEST, {"error": "invalid_transcript_edit"})
+            return
+        except JobNotFoundError:
+            self._json(HTTPStatus.NOT_FOUND, {"error": "transcript_item_not_found"})
+            return
+        except JobStateError:
+            self._json(HTTPStatus.CONFLICT, {"error": "transcript_cannot_be_edited"})
+            return
+        self._json(HTTPStatus.OK, job.model_dump(mode="json"))
 
     def do_DELETE(self) -> None:
         path = urlsplit(self.path).path
@@ -224,13 +297,22 @@ class CommandCenterHandler(BaseHTTPRequestHandler):
         if content_length <= 0 or content_length > self.server.max_upload_bytes:
             self._json(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, {"error": "invalid_upload_size"})
             return
+        transcribe = self.headers.get("X-MVI-Transcribe", "").casefold() == "true"
+        if transcribe and self.server.transcription_runtime.provider is None:
+            self._json(HTTPStatus.CONFLICT, {"error": "transcription_not_configured"})
+            return
         job_id = secrets.token_hex(12)
         try:
-            _job, upload_path = self.server.job_manager.reserve(job_id, filename)
+            _job, upload_path = self.server.job_manager.reserve(
+                job_id,
+                filename,
+                transcribe=transcribe,
+            )
         except JobCapacityError:
             self._json(HTTPStatus.TOO_MANY_REQUESTS, {"error": "job_capacity_reached"})
             return
         remaining = content_length
+        digest = hashlib.sha256()
         try:
             self.connection.settimeout(30)
             with upload_path.open("xb") as destination:
@@ -239,8 +321,15 @@ class CommandCenterHandler(BaseHTTPRequestHandler):
                     if not chunk:
                         raise OSError("upload ended before the declared content length")
                     destination.write(chunk)
+                    digest.update(chunk)
                     remaining -= len(chunk)
-            job = self.server.job_manager.submit(job_id)
+            job = self.server.job_manager.submit(job_id, content_sha256=digest.hexdigest())
+        except DuplicateMediaError as exc:
+            self._json(
+                HTTPStatus.CONFLICT,
+                {"error": "duplicate_media", "existing_job_id": exc.existing_job_id},
+            )
+            return
         except OSError:
             job = self.server.job_manager.fail_upload(
                 job_id,
@@ -251,11 +340,17 @@ class CommandCenterHandler(BaseHTTPRequestHandler):
         self._json(HTTPStatus.ACCEPTED, job.model_dump(mode="json"))
 
 
-def run_server(state_dir: Path, port: int, max_upload_bytes: int) -> None:
+def run_server(state_dir: Path, data_dir: Path, port: int, max_upload_bytes: int) -> None:
     token = os.environ.get("VIDEO_INTELLIGENCE_CC_TOKEN")
     if token is None or len(token) < 32:
         raise RuntimeError("A command-center token is required.")
-    server = CommandCenterHTTPServer(("127.0.0.1", port), token, state_dir, max_upload_bytes)
+    server = CommandCenterHTTPServer(
+        ("127.0.0.1", port),
+        token,
+        state_dir,
+        max_upload_bytes,
+        data_dir,
+    )
     state = RuntimeState(
         pid=os.getpid(),
         port=server.server_port,
@@ -275,10 +370,11 @@ def run_server(state_dir: Path, port: int, max_upload_bytes: int) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--state-dir", type=Path, required=True)
+    parser.add_argument("--data-dir", type=Path, required=True)
     parser.add_argument("--port", type=int, default=0)
     parser.add_argument("--max-upload-bytes", type=int, required=True)
     args = parser.parse_args()
-    run_server(args.state_dir, args.port, args.max_upload_bytes)
+    run_server(args.state_dir, args.data_dir, args.port, args.max_upload_bytes)
     return 0
 
 
